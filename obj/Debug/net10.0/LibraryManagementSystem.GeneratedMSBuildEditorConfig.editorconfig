@@ -51,6 +51,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQm9ycm93ZXJzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/diksh/Desktop/LibraryManagementAssessment/Project/LibraryManagementsystem/Views/Fines/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluZXNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diksh/Desktop/LibraryManagementAssessment/Project/LibraryManagementsystem/Views/Fines/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluZXNcRGVsZXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diksh/Desktop/LibraryManagementAssessment/Project/LibraryManagementsystem/Views/Fines/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluZXNcRGV0YWlscy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/diksh/Desktop/LibraryManagementAssessment/Project/LibraryManagementsystem/Views/Fines/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluZXNcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/diksh/Desktop/LibraryManagementAssessment/Project/LibraryManagementsystem/Views/Fines/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmluZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

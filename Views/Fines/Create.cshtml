@@ -1,0 +1,79 @@
+@model LibraryManagementSystem.Models.Fine
+
+@{
+    ViewData["Title"] = "Create Fine";
+}
+
+<h1>Create Fine</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly"
+                 class="text-danger">
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="LoanId" class="form-label">
+                    Loan
+                </label>
+
+                <select asp-for="LoanId"
+                        class="form-select"
+                        asp-items="@(new SelectList(ViewBag.Loans, "Id", "Id"))">
+                    <option value="">-- Select a loan --</option>
+                </select>
+
+                <span asp-validation-for="LoanId"
+                      class="text-danger">
+                </span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Amount" class="form-label">
+                    Amount
+                </label>
+
+                <input asp-for="Amount"
+                       class="form-control"
+                       type="number"
+                       step="0.01"
+                       min="0" />
+
+                <span asp-validation-for="Amount"
+                      class="text-danger">
+                </span>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="IsPaid"
+                       class="form-check-input" />
+
+                <label asp-for="IsPaid"
+                       class="form-check-label">
+                    Paid
+                </label>
+            </div>
+
+            <button type="submit"
+                    class="btn btn-primary">
+                Create
+            </button>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+                Back to List
+            </a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

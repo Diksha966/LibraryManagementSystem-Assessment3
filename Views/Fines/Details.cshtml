@@ -1,0 +1,59 @@
+@model LibraryManagementSystem.Models.Fine
+
+@{
+    ViewData["Title"] = "Fine Details";
+}
+
+<h1>Fine Details</h1>
+
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-3">Fine ID</dt>
+    <dd class="col-sm-9">@Model.Id</dd>
+
+    <dt class="col-sm-3">Loan ID</dt>
+    <dd class="col-sm-9">@Model.LoanId</dd>
+
+    <dt class="col-sm-3">Amount</dt>
+    <dd class="col-sm-9">@Model.Amount.ToString("C")</dd>
+
+    <dt class="col-sm-3">Payment Status</dt>
+    <dd class="col-sm-9">
+        @if (Model.IsPaid)
+        {
+            <span class="badge bg-success">Paid</span>
+        }
+        else
+        {
+            <span class="badge bg-danger">Unpaid</span>
+        }
+    </dd>
+</dl>
+
+<div>
+    <a asp-action="Edit"
+       asp-route-id="@Model.Id"
+       class="btn btn-warning">
+        Edit
+    </a>
+
+    @if (!Model.IsPaid)
+    {
+        <form asp-action="MarkAsPaid"
+              asp-route-id="@Model.Id"
+              method="post"
+              class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit"
+                    class="btn btn-success">
+                Mark as Paid
+            </button>
+        </form>
+    }
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Back to List
+    </a>
+</div>
