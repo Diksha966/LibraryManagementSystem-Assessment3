@@ -7,7 +7,7 @@
 <h1>Borrowers</h1>
 
 <p>
-    <a asp-controller="Home" asp-action="Index">Home</a>
+    <a asp-action="Create" class="btn btn-primary">Create New Borrower</a>
 </p>
 
 <table class="table">
@@ -15,15 +15,20 @@
         <tr>
             <th>Name</th>
             <th>Email</th>
+            <th>Actions</th>
         </tr>
     </thead>
-
     <tbody>
         @foreach (var borrower in Model)
         {
             <tr>
                 <td>@borrower.Name</td>
                 <td>@borrower.Email</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@borrower.Id">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@borrower.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@borrower.Id">Delete</a>
+                </td>
             </tr>
         }
     </tbody>
