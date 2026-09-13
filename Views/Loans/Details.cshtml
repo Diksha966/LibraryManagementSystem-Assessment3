@@ -1,0 +1,33 @@
+@model LibraryManagementSystem.Models.Loan
+
+@{
+    ViewData["Title"] = "Loan Details";
+}
+
+<h1>Loan Details</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Item</dt>
+        <dd class="col-sm-9">@Model.Item?.Title</dd>
+
+        <dt class="col-sm-3">Borrower</dt>
+        <dd class="col-sm-9">@Model.Borrower?.Name</dd>
+
+        <dt class="col-sm-3">Borrowed Date</dt>
+        <dd class="col-sm-9">@Model.BorrowedDate.ToShortDateString()</dd>
+
+        <dt class="col-sm-3">Returned Date</dt>
+        <dd class="col-sm-9">
+            @(Model.ReturnedDate.HasValue
+                ? Model.ReturnedDate.Value.ToShortDateString()
+                : "Not returned")
+        </dd>
+
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">@Model.Status</dd>
+    </dl>
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>

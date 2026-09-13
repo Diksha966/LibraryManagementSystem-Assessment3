@@ -6,23 +6,53 @@
 
 <h1>Loans</h1>
 
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Loan</a>
+</p>
+
 <table class="table">
     <thead>
         <tr>
             <th>Item</th>
             <th>Borrower</th>
+            <th>Borrowed Date</th>
+            <th>Returned Date</th>
+            <th>Status</th>
+            <th>Actions</th>
         </tr>
     </thead>
-
     <tbody>
         @foreach (var loan in Model)
         {
             <tr>
+                <td>@loan.Item?.Title</td>
+                <td>@loan.Borrower?.Name</td>
+                <td>@loan.BorrowedDate.ToShortDateString()</td>
                 <td>
-                    @(loan.Item?.Title ?? "Unknown item")
+                    @(loan.ReturnedDate.HasValue
+                        ? loan.ReturnedDate.Value.ToShortDateString()
+                        : "Not returned")
                 </td>
+                <td>@loan.Status</td>
                 <td>
-                    @(loan.Borrower?.Name ?? "Unknown borrower")
+                    <a asp-action="Details" asp-route-id="@loan.Id">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@loan.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@loan.Id">Delete</a>
+
+                    @if (loan.Status == LoanStatus.Active)
+                    {
+                        <form asp-action="Return"
+                              asp-route-id="@loan.Id"
+                              method="post"
+                              style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit"
+                                    class="btn btn-link p-0"
+                                    onclick="return confirm('Mark this loan as returned?');">
+                                Return
+                            </button>
+                        </form>
+                    }
                 </td>
             </tr>
         }

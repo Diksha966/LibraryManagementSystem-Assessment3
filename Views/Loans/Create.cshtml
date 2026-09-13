@@ -1,0 +1,36 @@
+@model LibraryManagementSystem.Models.Loan
+
+@{
+    ViewData["Title"] = "Create Loan";
+}
+
+<h1>Create Loan</h1>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="ItemId" class="form-label">Item</label>
+        <select asp-for="ItemId" class="form-control" asp-items="ViewBag.ItemId">
+            <option value="">-- Select an item --</option>
+        </select>
+        <span asp-validation-for="ItemId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BorrowerId" class="form-label">Borrower</label>
+        <select asp-for="BorrowerId" class="form-control" asp-items="ViewBag.BorrowerId">
+            <option value="">-- Select a borrower --</option>
+        </select>
+        <span asp-validation-for="BorrowerId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
