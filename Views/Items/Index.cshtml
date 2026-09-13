@@ -7,15 +7,16 @@
 <h1>Library Items</h1>
 
 <p>
-    <a asp-controller="Home" asp-action="Index">Home</a>
+    <a asp-action="Create" class="btn btn-primary">Add New Item</a>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Home</a>
 </p>
 
 <table class="table">
     <thead>
         <tr>
-            <th>Title/Name</th>
-            <th>Item Type</th>
+            <th>Title</th>
             <th>Status</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -23,8 +24,20 @@
         {
             <tr>
                 <td>@item.Title</td>
-                <td>@item.GetType().Name</td>
                 <td>@item.Status</td>
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@item.Id"
+                       class="btn btn-info btn-sm">Details</a>
+
+                    <a asp-action="Edit"
+                       asp-route-id="@item.Id"
+                       class="btn btn-warning btn-sm">Edit</a>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@item.Id"
+                       class="btn btn-danger btn-sm">Delete</a>
+                </td>
             </tr>
         }
     </tbody>
