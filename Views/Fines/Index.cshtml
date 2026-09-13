@@ -1,0 +1,33 @@
+@model IEnumerable<LibraryManagementSystem.Models.Fine>
+
+@{
+    ViewData["Title"] = "Fines";
+}
+
+<h1>Fines</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Borrower</th>
+            <th>Item</th>
+            <th>Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var fine in Model)
+        {
+            <tr>
+                <td>
+                    @(fine.Loan?.Borrower?.Name ?? "Unknown borrower")
+                </td>
+                <td>
+                    @(fine.Loan?.Item?.Title ?? "Unknown item")
+                </td>
+                <td>
+                    @fine.Amount
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

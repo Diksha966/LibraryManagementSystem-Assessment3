@@ -1,0 +1,30 @@
+@model IEnumerable<LibraryManagementSystem.Models.Loan>
+
+@{
+    ViewData["Title"] = "Loans";
+}
+
+<h1>Loans</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Item</th>
+            <th>Borrower</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var loan in Model)
+        {
+            <tr>
+                <td>
+                    @(loan.Item?.Title ?? "Unknown item")
+                </td>
+                <td>
+                    @(loan.Borrower?.Name ?? "Unknown borrower")
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

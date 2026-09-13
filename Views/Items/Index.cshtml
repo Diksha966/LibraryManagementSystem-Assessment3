@@ -1,0 +1,31 @@
+@model IEnumerable<LibraryManagementSystem.Models.Item>
+
+@{
+    ViewData["Title"] = "Library Items";
+}
+
+<h1>Library Items</h1>
+
+<p>
+    <a asp-controller="Home" asp-action="Index">Home</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title/Name</th>
+            <th>Item Type</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.GetType().Name</td>
+                <td>@item.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>

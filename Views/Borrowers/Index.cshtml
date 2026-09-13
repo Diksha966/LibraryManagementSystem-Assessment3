@@ -1,0 +1,30 @@
+@model IEnumerable<LibraryManagementSystem.Models.Borrower>
+
+@{
+    ViewData["Title"] = "Borrowers";
+}
+
+<h1>Borrowers</h1>
+
+<p>
+    <a asp-controller="Home" asp-action="Index">Home</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var borrower in Model)
+        {
+            <tr>
+                <td>@borrower.Name</td>
+                <td>@borrower.Email</td>
+            </tr>
+        }
+    </tbody>
+</table>
