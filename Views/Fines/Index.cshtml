@@ -13,20 +13,35 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Fine ID</th>
+            <th>Item</th>
+            <th>Borrower</th>
             <th>Loan ID</th>
             <th>Amount</th>
             <th>Payment Status</th>
             <th>Actions</th>
         </tr>
     </thead>
+
     <tbody>
         @foreach (var fine in Model)
         {
             <tr>
-                <td>@fine.Id</td>
-                <td>@fine.LoanId</td>
-                <td>@fine.Amount.ToString("C")</td>
+                <td>
+                    @(fine.Loan?.Item?.Title ?? "Unknown item")
+                </td>
+
+                <td>
+                    @(fine.Loan?.Borrower?.Name ?? "Unknown borrower")
+                </td>
+
+                <td>
+                    @fine.LoanId
+                </td>
+
+                <td>
+                    <strong>@fine.Amount.ToString("C")</strong>
+                </td>
+
                 <td>
                     @if (fine.IsPaid)
                     {
@@ -37,22 +52,23 @@
                         <span class="badge bg-danger">Unpaid</span>
                     }
                 </td>
+
                 <td>
                     <a asp-action="Details"
                        asp-route-id="@fine.Id"
-                       class="btn btn-sm btn-info">
+                       class="btn btn-info btn-sm">
                         Details
                     </a>
 
                     <a asp-action="Edit"
                        asp-route-id="@fine.Id"
-                       class="btn btn-sm btn-warning">
+                       class="btn btn-warning btn-sm">
                         Edit
                     </a>
 
                     <a asp-action="Delete"
                        asp-route-id="@fine.Id"
-                       class="btn btn-sm btn-danger">
+                       class="btn btn-danger btn-sm">
                         Delete
                     </a>
 
@@ -62,9 +78,11 @@
                               asp-route-id="@fine.Id"
                               method="post"
                               class="d-inline">
+
                             @Html.AntiForgeryToken()
+
                             <button type="submit"
-                                    class="btn btn-sm btn-success"
+                                    class="btn btn-success btn-sm"
                                     onclick="return confirm('Mark this fine as paid?');">
                                 Mark as Paid
                             </button>

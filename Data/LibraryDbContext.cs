@@ -1,9 +1,10 @@
 using LibraryManagementSystem.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystem.Data
 {
-    public class LibraryDbContext : DbContext
+    public class LibraryDbContext : IdentityDbContext
     {
         public LibraryDbContext(DbContextOptions<LibraryDbContext> options)
             : base(options)
@@ -22,74 +23,80 @@ namespace LibraryManagementSystem.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Seed Book
             modelBuilder.Entity<Book>().HasData(
-    new Book
-    {
-        Id = 1,
-        Title = "The Hobbit",
-        Author = "J.R.R. Tolkien",
-        ISBN = "9780547928227",
-        Status = ItemStatus.Available
-    }
-);
+                new Book
+                {
+                    Id = 1,
+                    Title = "The Hobbit",
+                    Description = "A fantasy adventure novel about Bilbo Baggins.",
+                    LibraryCode = "BK001",
+                    Author = "J.R.R. Tolkien",
+                    Genre = "Fantasy",
+                    ISBN = "9780547928227",
+                    Status = ItemStatus.Borrowed
+                }
+            );
 
-modelBuilder.Entity<Toy>().HasData(
-    new Toy
-    {
-        Id = 2,
-        Title = "LEGO Classic Set",
-        RecommendedAge = "8",
-        Status = ItemStatus.Available
-    }
-);
+            // Seed Toy
+            modelBuilder.Entity<Toy>().HasData(
+                new Toy
+                {
+                    Id = 2,
+                    Title = "LEGO Classic Set",
+                    Description = "A creative building set for children.",
+                    LibraryCode = "TY001",
+                    ToyType = "Building",
+                    RecommendedAge = 8,
+                    Status = ItemStatus.Available
+                }
+            );
 
-modelBuilder.Entity<Music>().HasData(
-    new Music
-    {
-        Id = 3,
-        Title = "Thriller",
-        Artist = "Michael Jackson",
-        Format = "CD",
-        Status = ItemStatus.Available
-    }
-);
+            // Seed Music
+            modelBuilder.Entity<Music>().HasData(
+                new Music
+                {
+                    Id = 3,
+                    Title = "Thriller",
+                    Description = "The classic album by Michael Jackson.",
+                    LibraryCode = "MU001",
+                    Artist = "Michael Jackson",
+                    Year = 1982,
+                    Format = "CD",
+                    Status = ItemStatus.Available
+                }
+            );
 
-modelBuilder.Entity<Borrower>().HasData(
-    new Borrower
-    {
-        Id = 1,
-        Name = "John Smith",
-        Email = "john.smith@example.com"
-    },
-    new Borrower
-    {
-        Id = 2,
-        Name = "Jane Doe",
-        Email = "jane.doe@example.com"
-    }
-);
+            // Seed Borrowers
+            modelBuilder.Entity<Borrower>().HasData(
+                new Borrower
+                {
+                    Id = 1,
+                    Name = "John Smith",
+                    Email = "john.smith@example.com"
+                },
+                new Borrower
+                {
+                    Id = 2,
+                    Name = "Jane Doe",
+                    Email = "jane.doe@example.com"
+                }
+            );
 
-modelBuilder.Entity<Loan>().HasData(
-    new Loan
-    {
-        Id = 1,
-        ItemId = 1,
-        BorrowerId = 1,
-        BorrowedDate = new DateTime(2026, 9, 1),
-        Status = LoanStatus.Active
-    }
-);
+            // Seed Loan
+            modelBuilder.Entity<Loan>().HasData(
+               new Loan
+{
+    Id = 1,
+    ItemId = 1,
+    BorrowerId = 1,
+    BorrowedDate = new DateTime(2026, 9, 1),
+    DueDate = new DateTime(2026, 9, 15),
+    Status = LoanStatus.Active
+}
+            );
 
-modelBuilder.Entity<Fine>().HasData(
-    new Fine
-    {
-        Id = 1,
-        LoanId = 1,
-        Amount = 5.00m,
-        IsPaid = false
-    }
-);
-
+            
         }
     }
 }

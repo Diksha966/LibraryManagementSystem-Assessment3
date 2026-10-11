@@ -1,0 +1,196 @@
+@model IEnumerable<LibraryManagementSystem.Models.Item>
+
+@{
+    ViewData["Title"] = "Public Library Search";
+}
+
+<div class="container-fluid py-4 px-3">
+
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+
+        <h1 class="fw-bold public-library-title">
+            📚 Public Library Search
+        </h1>
+
+        <p class="lead public-library-subtitle mb-0">
+            Search our library collection by title or library code.
+        </p>
+
+    </div>
+
+
+    <!-- Search Box -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body p-3">
+
+            <form asp-action="Index" method="get">
+
+                <div class="row g-2">
+
+                    <div class="col-12 col-md">
+                        <input type="text"
+                               name="search"
+                               value="@ViewBag.Search"
+                               class="form-control form-control-lg"
+                               placeholder="Search by title or library code..."
+                               aria-label="Search library items" />
+                    </div>
+
+                    <div class="col-12 col-md-auto">
+                        <button type="submit"
+                                class="btn btn-primary btn-lg w-100">
+                            Search
+                        </button>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- Search Results Heading -->
+    @if (!string.IsNullOrWhiteSpace(ViewBag.Search))
+    {
+        <div class="mb-3">
+
+            <h5 class="search-results-heading">
+                Search results for:
+                <strong>@ViewBag.Search</strong>
+            </h5>
+
+        </div>
+    }
+
+
+    <!-- No Results -->
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">
+            No library items were found.
+        </div>
+    }
+    else
+    {
+        <!-- Library Items -->
+        <div class="row g-4">
+
+            @foreach (var item in Model)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        <div class="card-body d-flex flex-column">
+
+                            <h4 class="card-title item-title">
+                                @item.Title
+                            </h4>
+
+                            <p class="mb-2">
+                                <strong>Library Code:</strong>
+                                @item.LibraryCode
+                            </p>
+
+                            <p class="mb-3">
+                                @item.Description
+                            </p>
+
+                            <p class="mb-3">
+                                <strong>Status:</strong>
+
+                                @if (item.Status ==
+                                    LibraryManagementSystem.Models.ItemStatus.Available)
+                                {
+                                    <span class="badge bg-success">
+                                        Available
+                                    </span>
+                                }
+                                else if (item.Status ==
+                                    LibraryManagementSystem.Models.ItemStatus.Borrowed)
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Borrowed
+                                    </span>
+                                }
+                                else if (item.Status ==
+                                    LibraryManagementSystem.Models.ItemStatus.Damaged)
+                                {
+                                    <span class="badge bg-danger">
+                                        Damaged
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-dark">
+                                        Destroyed
+                                    </span>
+                                }
+                            </p>
+
+                            <div class="mt-auto">
+
+                               <a asp-controller="Public"
+                                  asp-action="Details"
+                                  asp-route-id="@item.Id"
+                                  class="btn btn-outline-primary">
+                                  View Details
+                            </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+
+<style>
+
+    .public-library-title {
+        font-size: clamp(2rem, 6vw, 3.5rem);
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+    }
+
+    .public-library-subtitle {
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .search-results-heading {
+        overflow-wrap: anywhere;
+    }
+
+    .item-title {
+        overflow-wrap: anywhere;
+    }
+
+    @@media (max-width: 576px) {
+
+        .public-library-title {
+            font-size: 2rem;
+        }
+
+        .public-library-subtitle {
+            font-size: 1.1rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+
+    }
+
+</style>

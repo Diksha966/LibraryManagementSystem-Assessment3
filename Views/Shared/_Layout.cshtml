@@ -15,6 +15,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
+
                 <a class="navbar-brand"
                    asp-area=""
                    asp-controller="Home"
@@ -33,7 +34,10 @@
                 </button>
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
                     <ul class="navbar-nav flex-grow-1">
+
+                        <!-- Everyone -->
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-area=""
@@ -52,39 +56,78 @@
                             </a>
                         </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-area=""
-                               asp-controller="Items"
-                               asp-action="Index">
-                                Library Items
-                            </a>
-                        </li>
+                        <!-- Admin navigation -->
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Items"
+                                   asp-action="Index">
+                                    Library Items
+                                </a>
+                            </li>
+                        }
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark"
-                               asp-area=""
-                               asp-controller="Borrowers"
-                               asp-action="Index">
-                                Borrowers
-                            </a>
-                        </li>
+                        <!-- Reception navigation -->
+                        @if (User.IsInRole("Reception"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Borrowers"
+                                   asp-action="Index">
+                                    Borrowers
+                                </a>
+                            </li>
 
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Loans"
+                                   asp-action="Index">
+                                    Loans
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Fines"
+                                   asp-action="Index">
+                                    Fines
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Manager navigation -->
+                        @if (User.IsInRole("Manager"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Manager"
+                                   asp-action="Index">
+                                    Manager Dashboard
+                                </a>
+                            </li>
+                        }
+
+                        <!-- Public portal -->
                         <li class="nav-item">
                             <a class="nav-link text-dark"
                                asp-area=""
-                               asp-controller="Loans"
+                               asp-controller="Public"
                                asp-action="Index">
-                                Loans
+                                Public Library
                             </a>
                         </li>
-                        <li class="nav-item">
-    <a class="nav-link text-dark" asp-controller="Fines" asp-action="Index">
-        Fines
-    </a>
-</li>
 
                     </ul>
+
+                    <!-- Login / Logout section -->
+                    <partial name="_LoginPartial" />
+
                 </div>
             </div>
         </nav>

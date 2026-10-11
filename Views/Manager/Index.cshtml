@@ -1,0 +1,170 @@
+@{
+    ViewData["Title"] = "Manager Dashboard";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h1 class="display-6 fw-bold">Manager Dashboard</h1>
+        <p class="text-muted">
+            Overview of borrowing activity, item status and fines.
+        </p>
+    </div>
+
+    <!-- Borrowing Statistics -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h4 mb-3">Borrowing Statistics</h2>
+
+            <div class="row g-3">
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Total Loans</h6>
+                            <h2>@ViewBag.TotalLoans</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Active Loans</h6>
+                            <h2>@ViewBag.ActiveLoans</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Returned Loans</h6>
+                            <h2>@ViewBag.ReturnedLoans</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Overdue Loans</h6>
+                            <h2>@ViewBag.OverdueLoans</h2>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Item Statistics -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h4 mb-3">Item Status Statistics</h2>
+
+            <div class="row g-3">
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Total Items</h6>
+                            <h2>@ViewBag.TotalItems</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Available</h6>
+                            <h2>@ViewBag.AvailableItems</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Borrowed</h6>
+                            <h2>@ViewBag.BorrowedItems</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Damaged</h6>
+                            <h2>@ViewBag.DamagedItems</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Destroyed</h6>
+                            <h2>@ViewBag.DestroyedItems</h2>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Fine Statistics -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h4 mb-3">Fine Statistics</h2>
+
+            <div class="row g-3">
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Total Fines</h6>
+                            <h2>@ViewBag.TotalFines</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Paid Fines</h6>
+                            <h2>@ViewBag.PaidFines</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Unpaid Fines</h6>
+                            <h2>@ViewBag.UnpaidFines</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Total Fine Amount</h6>
+                            <h2>$@ViewBag.TotalFineAmount.ToString("0.00")</h2>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-3">
+                <strong>Unpaid Fine Amount:</strong>
+                $@ViewBag.UnpaidFineAmount.ToString("0.00")
+            </div>
+
+        </div>
+    </div>
+
+</div>

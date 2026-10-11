@@ -2,9 +2,11 @@ using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryManagementSystem.Controllers
 {
+    [Authorize(Roles = "Reception")]
     public class BorrowersController : Controller
     {
         private readonly LibraryDbContext _context;
@@ -14,6 +16,7 @@ namespace LibraryManagementSystem.Controllers
             _context = context;
         }
 
+        // GET: Borrowers
         public async Task<IActionResult> Index()
         {
             var borrowers = await _context.Borrowers
@@ -23,6 +26,7 @@ namespace LibraryManagementSystem.Controllers
             return View(borrowers);
         }
 
+        // GET: Borrowers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -37,15 +41,17 @@ namespace LibraryManagementSystem.Controllers
             return View(borrower);
         }
 
+        // GET: Borrowers/Create
         public IActionResult Create()
         {
             return View();
         }
 
+        // POST: Borrowers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Name,Email")] Borrower borrower)
+            [Bind("Name,Email,Phone")] Borrower borrower)
         {
             if (!ModelState.IsValid)
                 return View(borrower);
@@ -56,6 +62,7 @@ namespace LibraryManagementSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Borrowers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -69,11 +76,12 @@ namespace LibraryManagementSystem.Controllers
             return View(borrower);
         }
 
+        // POST: Borrowers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(
             int id,
-            [Bind("Id,Name,Email")] Borrower borrower)
+            [Bind("Id,Name,Email,Phone")] Borrower borrower)
         {
             if (id != borrower.Id)
                 return NotFound();
@@ -87,6 +95,7 @@ namespace LibraryManagementSystem.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: Borrowers/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -101,6 +110,7 @@ namespace LibraryManagementSystem.Controllers
             return View(borrower);
         }
 
+        // POST: Borrowers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

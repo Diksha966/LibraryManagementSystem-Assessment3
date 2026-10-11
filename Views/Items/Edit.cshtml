@@ -1,30 +1,127 @@
-@model LibraryManagementSystem.Models.Item
+@model LibraryManagementSystem.Models.ItemFormViewModel
 
 @{
-    ViewData["Title"] = "Edit Item";
+    ViewData["Title"] = "Edit Library Item";
 }
 
-<h1>Edit Item</h1>
+<h1>Edit Library Item</h1>
+
+<hr />
 
 <form asp-action="Edit" method="post">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
     <input type="hidden" asp-for="Id" />
 
-    <div class="form-group mb-3">
-        <label asp-for="Title" class="control-label"></label>
+    <div class="mb-3">
+        <label asp-for="ItemType" class="form-label">Item Type</label>
+        <select asp-for="ItemType" class="form-select">
+            <option value="Book">Book</option>
+            <option value="Toy">Toy</option>
+            <option value="Music">Music</option>
+        </select>
+        <span asp-validation-for="ItemType" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
         <input asp-for="Title" class="form-control" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Status" class="control-label"></label>
-        <select asp-for="Status" class="form-control"
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LibraryCode" class="form-label"></label>
+        <input asp-for="LibraryCode" class="form-control" />
+        <span asp-validation-for="LibraryCode" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label"></label>
+        <select asp-for="Status"
+                class="form-select"
                 asp-items="Html.GetEnumSelectList<LibraryManagementSystem.Models.ItemStatus>()">
         </select>
         <span asp-validation-for="Status" class="text-danger"></span>
     </div>
 
+    <hr />
+
+    <h4>Book Information</h4>
+
+    <div class="mb-3">
+        <label asp-for="Author" class="form-label"></label>
+        <input asp-for="Author" class="form-control" />
+        <span asp-validation-for="Author" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Genre" class="form-label"></label>
+        <input asp-for="Genre" class="form-control" />
+        <span asp-validation-for="Genre" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ISBN" class="form-label"></label>
+        <input asp-for="ISBN" class="form-control" />
+        <span asp-validation-for="ISBN" class="text-danger"></span>
+    </div>
+
+    <hr />
+
+    <h4>Toy Information</h4>
+
+    <div class="mb-3">
+        <label asp-for="ToyType" class="form-label"></label>
+        <input asp-for="ToyType" class="form-control" />
+        <span asp-validation-for="ToyType" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="RecommendedAge" class="form-label"></label>
+        <input asp-for="RecommendedAge"
+               class="form-control"
+               type="number"
+               min="0"
+               max="18" />
+        <span asp-validation-for="RecommendedAge" class="text-danger"></span>
+    </div>
+
+    <hr />
+
+    <h4>Music Information</h4>
+
+    <div class="mb-3">
+        <label asp-for="Artist" class="form-label"></label>
+        <input asp-for="Artist" class="form-control" />
+        <span asp-validation-for="Artist" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Year" class="form-label"></label>
+        <input asp-for="Year"
+               class="form-control"
+               type="number"
+               min="1900"
+               max="2100" />
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Format" class="form-label"></label>
+        <input asp-for="Format" class="form-control" />
+        <span asp-validation-for="Format" class="text-danger"></span>
+    </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
 </form>
 
 @section Scripts {

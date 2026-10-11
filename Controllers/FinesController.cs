@@ -1,10 +1,12 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystem.Controllers
 {
+    [Authorize(Roles = "Reception")]
     public class FinesController : Controller
     {
         private readonly LibraryDbContext _context;
@@ -19,10 +21,20 @@ namespace LibraryManagementSystem.Controllers
         {
             var fines = await _context.Fines
                 .Include(f => f.Loan)
-                    .ThenInclude(l => l.Borrower)
-                .Include(f => f.Loan)
-                    .ThenInclude(l => l.Item)
                 .ToListAsync();
+
+            foreach (var fine in fines)
+            {
+                if (fine.Loan != null)
+                {
+                    fine.Loan.Borrower = await _context.Borrowers
+                        .FirstOrDefaultAsync(
+                            b => b.Id == fine.Loan.BorrowerId);
+
+                    fine.Loan.Item = await FindItem(
+                        fine.Loan.ItemId);
+                }
+            }
 
             return View(fines);
         }
@@ -35,13 +47,20 @@ namespace LibraryManagementSystem.Controllers
 
             var fine = await _context.Fines
                 .Include(f => f.Loan)
-                    .ThenInclude(l => l.Borrower)
-                .Include(f => f.Loan)
-                    .ThenInclude(l => l.Item)
                 .FirstOrDefaultAsync(f => f.Id == id);
 
             if (fine == null)
                 return NotFound();
+
+            if (fine.Loan != null)
+            {
+                fine.Loan.Borrower = await _context.Borrowers
+                    .FirstOrDefaultAsync(
+                        b => b.Id == fine.Loan.BorrowerId);
+
+                fine.Loan.Item = await FindItem(
+                    fine.Loan.ItemId);
+            }
 
             return View(fine);
         }
@@ -49,10 +68,7 @@ namespace LibraryManagementSystem.Controllers
         // GET: Fines/Create
         public async Task<IActionResult> Create()
         {
-            ViewBag.Loans = await _context.Loans
-                .Include(l => l.Borrower)
-                .Include(l => l.Item)
-                .ToListAsync();
+            await LoadLoans();
 
             return View();
         }
@@ -71,10 +87,7 @@ namespace LibraryManagementSystem.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.Loans = await _context.Loans
-                .Include(l => l.Borrower)
-                .Include(l => l.Item)
-                .ToListAsync();
+            await LoadLoans();
 
             return View(fine);
         }
@@ -90,10 +103,7 @@ namespace LibraryManagementSystem.Controllers
             if (fine == null)
                 return NotFound();
 
-            ViewBag.Loans = await _context.Loans
-                .Include(l => l.Borrower)
-                .Include(l => l.Item)
-                .ToListAsync();
+            await LoadLoans();
 
             return View(fine);
         }
@@ -126,10 +136,7 @@ namespace LibraryManagementSystem.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.Loans = await _context.Loans
-                .Include(l => l.Borrower)
-                .Include(l => l.Item)
-                .ToListAsync();
+            await LoadLoans();
 
             return View(fine);
         }
@@ -142,13 +149,20 @@ namespace LibraryManagementSystem.Controllers
 
             var fine = await _context.Fines
                 .Include(f => f.Loan)
-                    .ThenInclude(l => l.Borrower)
-                .Include(f => f.Loan)
-                    .ThenInclude(l => l.Item)
                 .FirstOrDefaultAsync(f => f.Id == id);
 
             if (fine == null)
                 return NotFound();
+
+            if (fine.Loan != null)
+            {
+                fine.Loan.Borrower = await _context.Borrowers
+                    .FirstOrDefaultAsync(
+                        b => b.Id == fine.Loan.BorrowerId);
+
+                fine.Loan.Item = await FindItem(
+                    fine.Loan.ItemId);
+            }
 
             return View(fine);
         }
@@ -180,9 +194,42 @@ namespace LibraryManagementSystem.Controllers
                 return NotFound();
 
             fine.IsPaid = true;
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<Item?> FindItem(int id)
+        {
+            var book = await _context.Books
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (book != null)
+                return book;
+
+            var toy = await _context.Toys
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (toy != null)
+                return toy;
+
+            return await _context.Music
+                .FirstOrDefaultAsync(m => m.Id == id);
+        }
+
+        private async Task LoadLoans()
+        {
+            var loans = await _context.Loans
+                .Include(l => l.Borrower)
+                .ToListAsync();
+
+            foreach (var loan in loans)
+            {
+                loan.Item = await FindItem(loan.ItemId);
+            }
+
+            ViewBag.Loans = loans;
         }
 
         private bool FineExists(int id)

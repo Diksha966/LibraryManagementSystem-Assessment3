@@ -1,0 +1,150 @@
+@model LibraryManagementSystem.Models.Item
+
+@{
+    ViewData["Title"] = "Item Details";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <a asp-controller="Public"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            ← Back to Library
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+
+        <div class="card-header">
+            <h1 class="h3 mb-0">@Model.Title</h1>
+        </div>
+
+        <div class="card-body">
+
+            <dl class="row">
+
+                <dt class="col-sm-4">
+                    Library Code
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.LibraryCode
+                </dd>
+
+                <dt class="col-sm-4">
+                    Description
+                </dt>
+                <dd class="col-sm-8">
+                    @Model.Description
+                </dd>
+
+                <dt class="col-sm-4">
+                    Status
+                </dt>
+                <dd class="col-sm-8">
+                    @if (Model.Status ==
+                        LibraryManagementSystem.Models.ItemStatus.Available)
+                    {
+                        <span class="badge bg-success">
+                            Available
+                        </span>
+                    }
+                    else if (Model.Status ==
+                        LibraryManagementSystem.Models.ItemStatus.Borrowed)
+                    {
+                        <span class="badge bg-warning text-dark">
+                            Borrowed
+                        </span>
+                    }
+                    else if (Model.Status ==
+                        LibraryManagementSystem.Models.ItemStatus.Damaged)
+                    {
+                        <span class="badge bg-danger">
+                            Damaged
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-dark">
+                            Destroyed
+                        </span>
+                    }
+                </dd>
+
+                @if (Model is LibraryManagementSystem.Models.Book book)
+                {
+                    <dt class="col-sm-4">
+                        Author
+                    </dt>
+                    <dd class="col-sm-8">
+                        @book.Author
+                    </dd>
+
+                    <dt class="col-sm-4">
+                        Genre
+                    </dt>
+                    <dd class="col-sm-8">
+                        @book.Genre
+                    </dd>
+
+                    @if (!string.IsNullOrWhiteSpace(book.ISBN))
+                    {
+                        <dt class="col-sm-4">
+                            ISBN
+                        </dt>
+                        <dd class="col-sm-8">
+                            @book.ISBN
+                        </dd>
+                    }
+                }
+
+                @if (Model is LibraryManagementSystem.Models.Toy toy)
+                {
+                    <dt class="col-sm-4">
+                        Toy Type
+                    </dt>
+                    <dd class="col-sm-8">
+                        @toy.ToyType
+                    </dd>
+
+                    <dt class="col-sm-4">
+                        Recommended Age
+                    </dt>
+                    <dd class="col-sm-8">
+                        @toy.RecommendedAge+
+                    </dd>
+                }
+
+                @if (Model is LibraryManagementSystem.Models.Music music)
+                {
+                    <dt class="col-sm-4">
+                        Artist
+                    </dt>
+                    <dd class="col-sm-8">
+                        @music.Artist
+                    </dd>
+
+                    <dt class="col-sm-4">
+                        Year
+                    </dt>
+                    <dd class="col-sm-8">
+                        @music.Year
+                    </dd>
+
+                    @if (!string.IsNullOrWhiteSpace(music.Format))
+                    {
+                        <dt class="col-sm-4">
+                            Format
+                        </dt>
+                        <dd class="col-sm-8">
+                            @music.Format
+                        </dd>
+                    }
+                }
+
+            </dl>
+
+        </div>
+    </div>
+
+</div>

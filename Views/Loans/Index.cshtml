@@ -16,28 +16,53 @@
             <th>Item</th>
             <th>Borrower</th>
             <th>Borrowed Date</th>
+            <th>Due Date</th>
             <th>Returned Date</th>
             <th>Status</th>
             <th>Actions</th>
         </tr>
     </thead>
+
     <tbody>
         @foreach (var loan in Model)
         {
             <tr>
                 <td>@loan.Item?.Title</td>
+
                 <td>@loan.Borrower?.Name</td>
+
                 <td>@loan.BorrowedDate.ToShortDateString()</td>
+
+                <td>@loan.DueDate.ToShortDateString()</td>
+
                 <td>
                     @(loan.ReturnedDate.HasValue
                         ? loan.ReturnedDate.Value.ToShortDateString()
                         : "Not returned")
                 </td>
-                <td>@loan.Status</td>
+
                 <td>
-                    <a asp-action="Details" asp-route-id="@loan.Id">Details</a> |
-                    <a asp-action="Edit" asp-route-id="@loan.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@loan.Id">Delete</a>
+                    @loan.Status
+                </td>
+
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@loan.Id"
+                       class="btn btn-info btn-sm">
+                        Details
+                    </a>
+
+                    <a asp-action="Edit"
+                       asp-route-id="@loan.Id"
+                       class="btn btn-warning btn-sm">
+                        Edit
+                    </a>
+
+                    <a asp-action="Delete"
+                       asp-route-id="@loan.Id"
+                       class="btn btn-danger btn-sm">
+                        Delete
+                    </a>
 
                     @if (loan.Status == LoanStatus.Active)
                     {
@@ -45,9 +70,11 @@
                               asp-route-id="@loan.Id"
                               method="post"
                               style="display:inline">
+
                             @Html.AntiForgeryToken()
+
                             <button type="submit"
-                                    class="btn btn-link p-0"
+                                    class="btn btn-success btn-sm"
                                     onclick="return confirm('Mark this loan as returned?');">
                                 Return
                             </button>
