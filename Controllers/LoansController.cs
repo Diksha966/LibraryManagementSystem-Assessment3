@@ -1,5 +1,6 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services.Notifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,10 +12,14 @@ namespace LibraryManagementSystem.Controllers
     public class LoansController : Controller
     {
         private readonly LibraryDbContext _context;
+        private readonly INotificationService _notificationService;
 
-        public LoansController(LibraryDbContext context)
+        public LoansController(
+            LibraryDbContext context,
+            INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // GET: Loans
@@ -123,6 +128,15 @@ namespace LibraryManagementSystem.Controllers
                 _context.Loans.Add(loan);
 
                 await _context.SaveChangesAsync();
+
+                await _notificationService.LogAsync(
+                    category: "Loans",
+                    severity: "Info",
+                    title: "Item Borrowed",
+                    message: $"{borrower?.Name} borrowed {item.Title} ({item.LibraryCode}).",
+                    eventKey: $"loan-borrowed-{loan.Id}",
+                    entityType: "Loan",
+                    entityId: loan.Id);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -258,6 +272,8 @@ namespace LibraryManagementSystem.Controllers
             if (loan.Status == LoanStatus.Active)
             {
                 var item = await FindItem(loan.ItemId);
+                bool fineCreated = false;
+                decimal fineAmount = 0m;
 
                 loan.Status = LoanStatus.Returned;
                 loan.ReturnedDate = DateTime.Now;
@@ -275,7 +291,7 @@ namespace LibraryManagementSystem.Controllers
                         (loan.ReturnedDate.Value.Date -
                          loan.DueDate.Date).Days;
 
-                    decimal fineAmount = lateDays * 2.00m;
+                    fineAmount = lateDays * 2.00m;
 
                     var existingFine = await _context.Fines
                         .FirstOrDefaultAsync(
@@ -291,10 +307,32 @@ namespace LibraryManagementSystem.Controllers
                         };
 
                         _context.Fines.Add(fine);
+                        fineCreated = true;
                     }
                 }
 
                 await _context.SaveChangesAsync();
+
+                await _notificationService.LogAsync(
+                    category: "Loans",
+                    severity: "Info",
+                    title: "Item Returned",
+                    message: $"Loan #{loan.Id} has been returned.",
+                    eventKey: $"loan-returned-{loan.Id}",
+                    entityType: "Loan",
+                    entityId: loan.Id);
+
+                if (fineCreated)
+                {
+                    await _notificationService.LogAsync(
+                        category: "Fines",
+                        severity: "Warning",
+                        title: "Late Return Fine Generated",
+                        message: $"Loan #{loan.Id} generated a fine of ${fineAmount:0.00}.",
+                        eventKey: $"loan-fine-created-{loan.Id}",
+                        entityType: "Loan",
+                        entityId: loan.Id);
+                }
             }
 
             return RedirectToAction(nameof(Index));

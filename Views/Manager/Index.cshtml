@@ -1,5 +1,7 @@
 @{
     ViewData["Title"] = "Manager Dashboard";
+    var recentNotifications = ViewBag.RecentNotifications as List<LibraryManagementSystem.Models.NotificationLog>
+        ?? new List<LibraryManagementSystem.Models.NotificationLog>();
 }
 
 <div class="container py-4">
@@ -9,6 +11,14 @@
         <p class="text-muted">
             Overview of borrowing activity, item status and fines.
         </p>
+          <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-outline-primary"
+                    href="/api/exports/loans.csv">Export Loans CSV</a>
+                <a class="btn btn-outline-primary"
+                    href="/api/exports/notifications.csv">Export Notifications CSV</a>
+                <a class="btn btn-outline-secondary"
+                    href="/api/exports/dashboard.pdf">Export Dashboard PDF</a>
+          </div>
     </div>
 
     <!-- Borrowing Statistics -->
@@ -164,6 +174,79 @@
                 $@ViewBag.UnpaidFineAmount.ToString("0.00")
             </div>
 
+        </div>
+    </div>
+
+    <!-- Notification Statistics -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h4 mb-3">Notification Activity</h2>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Total Notifications</h6>
+                            <h2>@ViewBag.TotalNotifications</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Warning Notifications</h6>
+                            <h2>@ViewBag.WarningNotifications</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">Error Notifications</h6>
+                            <h2>@ViewBag.ErrorNotifications</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="h5">Recent Notifications</h3>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Time (UTC)</th>
+                            <th>Category</th>
+                            <th>Severity</th>
+                            <th>Title</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (recentNotifications.Any())
+                        {
+                            @foreach (var notification in recentNotifications)
+                            {
+                                <tr>
+                                    <td>@notification.CreatedAtUtc.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@notification.Category</td>
+                                    <td>@notification.Severity</td>
+                                    <td>@notification.Title</td>
+                                    <td>@notification.Message</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-muted">No notifications logged yet.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

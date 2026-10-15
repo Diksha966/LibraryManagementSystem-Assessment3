@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "kill-stale-lms-processes",
+      "type": "process",
+      "command": "powershell.exe",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/.vscode/kill-stale-lms-processes.ps1"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/LibraryManagementSystem.csproj"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "prepare-run",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "kill-stale-lms-processes",
+        "build"
+      ]
+    }
+  ]
+}

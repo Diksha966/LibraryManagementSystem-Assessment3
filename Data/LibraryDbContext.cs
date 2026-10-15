@@ -18,10 +18,32 @@ namespace LibraryManagementSystem.Data
         public DbSet<Borrower> Borrowers { get; set; }
         public DbSet<Loan> Loans { get; set; }
         public DbSet<Fine> Fines { get; set; }
+        public DbSet<NotificationLog> NotificationLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<NotificationLog>(entity =>
+            {
+                entity.Property(n => n.Category)
+                    .HasMaxLength(100);
+
+                entity.Property(n => n.Severity)
+                    .HasMaxLength(30);
+
+                entity.Property(n => n.Title)
+                    .HasMaxLength(200);
+
+                entity.Property(n => n.EntityType)
+                    .HasMaxLength(100);
+
+                entity.Property(n => n.EventKey)
+                    .HasMaxLength(120);
+
+                entity.HasIndex(n => n.EventKey)
+                    .IsUnique();
+            });
 
             // Seed Book
             modelBuilder.Entity<Book>().HasData(

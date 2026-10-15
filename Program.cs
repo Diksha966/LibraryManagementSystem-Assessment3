@@ -1,5 +1,7 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services.Exports;
+using LibraryManagementSystem.Services.Notifications;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IExportService, ExportService>();
+builder.Services.AddHostedService<OverdueNotificationBackgroundService>();
 
 // Register the Entity Framework Core database context.
 builder.Services.AddDbContext<LibraryDbContext>(options =>
@@ -32,6 +37,7 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapRazorPages();
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",

@@ -1,5 +1,6 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services.Notifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +11,14 @@ namespace LibraryManagementSystem.Controllers
     public class FinesController : Controller
     {
         private readonly LibraryDbContext _context;
+        private readonly INotificationService _notificationService;
 
-        public FinesController(LibraryDbContext context)
+        public FinesController(
+            LibraryDbContext context,
+            INotificationService notificationService)
         {
             _context = context;
+            _notificationService = notificationService;
         }
 
         // GET: Fines
@@ -193,9 +198,21 @@ namespace LibraryManagementSystem.Controllers
             if (fine == null)
                 return NotFound();
 
-            fine.IsPaid = true;
+            if (!fine.IsPaid)
+            {
+                fine.IsPaid = true;
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
+
+                await _notificationService.LogAsync(
+                    category: "Fines",
+                    severity: "Info",
+                    title: "Fine Marked As Paid",
+                    message: $"Fine #{fine.Id} has been marked as paid.",
+                    eventKey: $"fine-paid-{fine.Id}",
+                    entityType: "Fine",
+                    entityId: fine.Id);
+            }
 
             return RedirectToAction(nameof(Index));
         }

@@ -78,6 +78,21 @@ namespace LibraryManagementSystem.Controllers
                 .Where(f => !f.IsPaid)
                 .SumAsync(f => (decimal?)f.Amount) ?? 0m;
 
+            // Notification statistics
+            var totalNotifications = await _context.NotificationLogs
+                .CountAsync();
+
+            var warningNotifications = await _context.NotificationLogs
+                .CountAsync(n => n.Severity == "Warning");
+
+            var errorNotifications = await _context.NotificationLogs
+                .CountAsync(n => n.Severity == "Error");
+
+            var recentNotifications = await _context.NotificationLogs
+                .OrderByDescending(n => n.CreatedAtUtc)
+                .Take(10)
+                .ToListAsync();
+
             // Pass statistics to the dashboard view
             ViewBag.TotalLoans = totalLoans;
             ViewBag.ActiveLoans = activeLoans;
@@ -95,6 +110,11 @@ namespace LibraryManagementSystem.Controllers
             ViewBag.UnpaidFines = unpaidFines;
             ViewBag.TotalFineAmount = totalFineAmount;
             ViewBag.UnpaidFineAmount = unpaidFineAmount;
+
+            ViewBag.TotalNotifications = totalNotifications;
+            ViewBag.WarningNotifications = warningNotifications;
+            ViewBag.ErrorNotifications = errorNotifications;
+            ViewBag.RecentNotifications = recentNotifications;
 
             return View();
         }
