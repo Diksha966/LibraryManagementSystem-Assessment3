@@ -56,6 +56,16 @@
                             </a>
                         </li>
 
+                        @* Person 3: self-service kiosk *@
+                        <li class="nav-item">
+                            <a class="nav-link text-dark"
+                               asp-area=""
+                               asp-controller="Kiosk"
+                               asp-action="Index">
+                                Kiosk
+                            </a>
+                        </li>
+
                         <!-- Admin navigation -->
                         @if (User.IsInRole("Admin"))
                         {
@@ -84,6 +94,16 @@
                                    asp-controller="Transfers"
                                    asp-action="Index">
                                     Transfers
+                                </a>
+                            </li>
+
+                            @* Person 3: bulk CSV import *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Import"
+                                   asp-action="Index">
+                                    Import Items
                                 </a>
                             </li>
                         }
@@ -118,6 +138,16 @@
                                 </a>
                             </li>
 
+                            @* Person 3: reservation queues *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Reservations"
+                                   asp-action="Index">
+                                    Reservations
+                                </a>
+                            </li>
+
                             @if (!User.IsInRole("Admin"))
                             {
                                 @* Person 1: branch staff handle transfers *@
@@ -141,6 +171,16 @@
                                    asp-controller="Manager"
                                    asp-action="Index">
                                     Manager Dashboard
+                                </a>
+                            </li>
+
+                            @* Person 3: reports with CSV and PDF export *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Reports"
+                                   asp-action="Index">
+                                    Reports &amp; Exports
                                 </a>
                             </li>
 

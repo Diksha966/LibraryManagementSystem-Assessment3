@@ -1,0 +1,98 @@
+@using LibraryManagementSystem.Models
+@model IEnumerable<Reservation>
+@{
+    ViewData["Title"] = "Reservations";
+    bool showAll = ViewBag.ShowAll == true;
+}
+
+<div class="container py-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="display-6 fw-bold mb-0">Reservations</h1>
+            <p class="text-muted mb-0">Waitlist queues, first in line first.</p>
+        </div>
+
+        <div>
+            @if (showAll)
+            {
+                <a asp-action="Index" class="btn btn-outline-secondary">Show active only</a>
+            }
+            else
+            {
+                <a asp-action="Index" asp-route-showAll="true" class="btn btn-outline-secondary">Show history</a>
+            }
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">There are no reservations to show.</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Code</th>
+                        <th>Member</th>
+                        <th>Reserved</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td>@r.Item?.Title</td>
+                            <td>@r.Item?.LibraryCode</td>
+                            <td>
+                                @r.Borrower?.Name
+                                <div class="text-muted small">#@r.BorrowerId, @r.Borrower?.Email</div>
+                            </td>
+                            <td>@r.ReservedAt.ToString("d MMM yyyy HH:mm")</td>
+                            <td>
+                                @switch (r.Status)
+                                {
+                                    case ReservationStatus.Waiting:
+                                        <span class="badge bg-secondary">Waiting</span>
+                                        break;
+                                    case ReservationStatus.Notified:
+                                        <span class="badge bg-success">Notified</span>
+                                        break;
+                                    case ReservationStatus.Fulfilled:
+                                        <span class="badge bg-primary">Fulfilled</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-dark">Cancelled</span>
+                                        break;
+                                }
+                            </td>
+                            <td class="text-end">
+                                @if (r.Status == ReservationStatus.Waiting || r.Status == ReservationStatus.Notified)
+                                {
+                                    <form asp-action="Cancel" asp-route-id="@r.Id" method="post"
+                                          onsubmit="return confirm('Cancel this reservation?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Reports & Exports";
+
+    var reports = new[]
+    {
+        new { Key = "borrowing", Title = "Borrowing Statistics", Text = "Every loan with its dates and status, plus totals for active, overdue, returned and lost loans." },
+        new { Key = "fines", Title = "Fine Revenue Audit", Text = "Every fine with the borrower and item, plus totals assessed, collected and outstanding." },
+        new { Key = "inventory", Title = "Inventory Health", Text = "Every item with its status and how often it has been borrowed, plus counts of damaged and destroyed items." }
+    };
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+        <h1 class="display-6 fw-bold">Reports &amp; Exports</h1>
+        <p class="text-muted">Preview a report on screen, or download it as CSV (for spreadsheets) or PDF (for printing).</p>
+        <a asp-controller="Manager" asp-action="Index" class="btn btn-outline-secondary">← Back to dashboard</a>
+    </div>
+
+    <div class="row g-4">
+        @foreach (var report in reports)
+        {
+            <div class="col-12 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <h2 class="h4">@report.Title</h2>
+                        <p class="text-muted">@report.Text</p>
+
+                        <div class="mt-auto d-grid gap-2">
+                            <a asp-action="Preview" asp-route-type="@report.Key" class="btn btn-outline-primary">Preview</a>
+                            <a asp-action="Download" asp-route-type="@report.Key" asp-route-format="csv" class="btn btn-primary">Download CSV</a>
+                            <a asp-action="Download" asp-route-type="@report.Key" asp-route-format="pdf" class="btn btn-danger">Download PDF</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

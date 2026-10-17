@@ -1,0 +1,83 @@
+@using LibraryManagementSystem.ViewModels
+@using LibraryManagementSystem.Models
+@model ReserveViewModel
+@{
+    ViewData["Title"] = "Reserve an item";
+    bool canReserve = Model.ItemStatus == ItemStatus.Borrowed || Model.ItemStatus == ItemStatus.Damaged || Model.ItemStatus == ItemStatus.InTransit;
+}
+
+<div class="container py-4" style="max-width: 720px;">
+
+    <a asp-controller="Public" asp-action="Details" asp-route-id="@Model.ItemId"
+       class="btn btn-outline-secondary mb-3">← Back to item</a>
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h1 class="h3 mb-0">Reserve: @Model.ItemTitle</h1>
+        </div>
+
+        <div class="card-body">
+
+            <p class="mb-1"><strong>Library code:</strong> @Model.ItemCode</p>
+            <p class="mb-3"><strong>Current status:</strong> @Model.ItemStatus</p>
+
+            @if (Model.Submitted && Model.Success)
+            {
+                <div class="alert alert-success" role="alert">
+                    <strong>@Model.Message</strong><br />
+                    You are number <strong>@Model.Position</strong> in the queue.
+                    We will email you when the item is ready to borrow.
+                </div>
+            }
+            else if (!canReserve)
+            {
+                <div class="alert alert-info" role="alert">
+                    @if (Model.ItemStatus == ItemStatus.Available)
+                    {
+                        <text>This item is available now. You can borrow it at the reception desk or a self-service kiosk.</text>
+                    }
+                    else
+                    {
+                        <text>This item cannot be reserved.</text>
+                    }
+                </div>
+            }
+            else
+            {
+                if (Model.Submitted && !Model.Success)
+                {
+                    <div class="alert alert-danger" role="alert">@Model.Message</div>
+                }
+
+                <p>
+                    @if (Model.QueueLength == 0)
+                    {
+                        <text>Nobody is waiting for this item yet.</text>
+                    }
+                    else
+                    {
+                        <text>@Model.QueueLength @(Model.QueueLength == 1 ? "person is" : "people are") already waiting.</text>
+                    }
+                    Enter your details to join the queue.
+                </p>
+
+                <form asp-action="Index" asp-route-id="@Model.ItemId" method="post" autocomplete="off">
+                    <div class="mb-3">
+                        <label asp-for="MemberNumber" class="form-label"></label>
+                        <input asp-for="MemberNumber" class="form-control form-control-lg" inputmode="numeric" />
+                        <span asp-validation-for="MemberNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control form-control-lg" type="email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg w-100">Join the queue</button>
+                </form>
+            }
+
+        </div>
+    </div>
+</div>

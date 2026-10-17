@@ -1,5 +1,6 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services;
 using LibraryManagementSystem.Services.Branches;
 using LibraryManagementSystem.Services.Notifications;
 using Microsoft.AspNetCore.Authorization;
@@ -15,15 +16,18 @@ namespace LibraryManagementSystem.Controllers
         private readonly LibraryDbContext _context;
         private readonly INotificationService _notificationService;
         private readonly ITransferService _transferService;
+        private readonly ReservationService _reservations;
 
         public LoansController(
             LibraryDbContext context,
             INotificationService notificationService,
-            ITransferService transferService)
+            ITransferService transferService,
+            ReservationService reservations)
         {
             _context = context;
             _notificationService = notificationService;
             _transferService = transferService;
+            _reservations = reservations;
         }
 
         // GET: Loans
@@ -134,6 +138,17 @@ namespace LibraryManagementSystem.Controllers
                     "Please select a valid borrower.");
             }
 
+            // Person 3: a reserved item is held for the first person in the queue.
+            if (item != null &&
+                borrower != null &&
+                item.Status == ItemStatus.Available &&
+                !await _reservations.CanBorrowAsync(item.Id, borrower.Id))
+            {
+                ModelState.AddModelError(
+                    "LibraryCode",
+                    "This item is being held for another member who reserved it.");
+            }
+
             if (ModelState.IsValid && item != null)
             {
                 loan.ItemId = item.Id;
@@ -157,6 +172,9 @@ namespace LibraryManagementSystem.Controllers
                     entityType: "Loan",
                     entityId: loan.Id,
                     branchId: item.BranchId);
+
+                // Person 3: close the borrower's reservation for this item, if any.
+                await _reservations.FulfilAsync(item.Id, loan.BorrowerId);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -289,7 +307,9 @@ namespace LibraryManagementSystem.Controllers
             if (loan == null)
                 return NotFound();
 
-            if (loan.Status == LoanStatus.Active)
+            // Overdue loans can be returned too: the overdue background service
+            // sets LoanStatus.Overdue, which previously made them impossible to return.
+            if (loan.Status == LoanStatus.Active || loan.Status == LoanStatus.Overdue)
             {
                 var item = await FindItem(loan.ItemId);
                 bool fineCreated = false;
@@ -352,6 +372,13 @@ namespace LibraryManagementSystem.Controllers
                         eventKey: $"loan-fine-created-{loan.Id}",
                         entityType: "Loan",
                         entityId: loan.Id);
+                }
+
+                // Person 3: the item is Available again, so tell the next
+                // person in its reservation queue.
+                if (item != null)
+                {
+                    await _reservations.NotifyNextAsync(item.Id);
                 }
             }
 

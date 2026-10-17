@@ -1,0 +1,128 @@
+@using LibraryManagementSystem.ViewModels
+@using LibraryManagementSystem.Models
+@model KioskAccountViewModel
+@{
+    ViewData["Title"] = "My account";
+    Layout = "_KioskLayout";
+    var today = DateTime.Today;
+    decimal fineTotal = Model.UnpaidFines.Sum(f => f.Amount);
+}
+
+<h1 class="mb-1">@Model.Borrower.Name</h1>
+<p class="kiosk-lead">Member number @Model.Borrower.Id</p>
+
+<div class="card kiosk-card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h2 class="h3">Items on loan</h2>
+
+        @if (!Model.Loans.Any())
+        {
+            <p class="kiosk-lead mb-0">You have nothing on loan.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table kiosk-table align-middle mb-0">
+                    <thead>
+                        <tr><th>Item</th><th>Code</th><th>Due date</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var loan in Model.Loans)
+                        {
+                            bool overdue = loan.Status == LoanStatus.Overdue || loan.DueDate.Date < today;
+                            <tr>
+                                <td>@loan.Item?.Title</td>
+                                <td>@loan.Item?.LibraryCode</td>
+                                <td>@loan.DueDate.ToString("d MMM yyyy")</td>
+                                <td>
+                                    @if (overdue)
+                                    {
+                                        <span class="badge bg-danger">Overdue</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">On time</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card kiosk-card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h2 class="h3">Fines</h2>
+
+        @if (!Model.UnpaidFines.Any())
+        {
+            <p class="kiosk-lead mb-0">You have no unpaid fines.</p>
+        }
+        else
+        {
+            <p class="kiosk-lead">
+                You owe <strong>$@fineTotal.ToString("0.00")</strong>. Please pay at the reception desk.
+            </p>
+            <ul class="kiosk-table">
+                @foreach (var fine in Model.UnpaidFines)
+                {
+                    <li>@fine.Loan?.Item?.Title: $@fine.Amount.ToString("0.00")</li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+<div class="card kiosk-card shadow-sm mb-4">
+    <div class="card-body p-4">
+        <h2 class="h3">Reservations</h2>
+
+        @if (!Model.Reservations.Any())
+        {
+            <p class="kiosk-lead mb-0">You have no reservations.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table kiosk-table align-middle mb-0">
+                    <thead>
+                        <tr><th>Item</th><th>Code</th><th>Status</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var info in Model.Reservations)
+                        {
+                            <tr>
+                                <td>@info.Reservation.Item?.Title</td>
+                                <td>@info.Reservation.Item?.LibraryCode</td>
+                                <td>
+                                    @if (info.Reservation.Status == ReservationStatus.Notified)
+                                    {
+                                        <span class="badge bg-success">Ready to borrow!</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Position @info.Position in queue</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <form asp-action="CancelReservation" method="post">
+                                        <input type="hidden" name="id" value="@info.Reservation.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-lg">Cancel</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="d-grid gap-3 d-md-flex">
+    <a asp-action="Checkout" class="btn btn-primary kiosk-btn flex-fill d-flex align-items-center justify-content-center">Borrow an item</a>
+    <a asp-action="Reset" class="btn btn-outline-secondary kiosk-btn flex-fill d-flex align-items-center justify-content-center">Finish &amp; sign out</a>
+</div>

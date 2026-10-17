@@ -1,0 +1,30 @@
+@{
+    ViewData["Title"] = "Welcome";
+    Layout = "_KioskLayout";
+}
+
+<div class="text-center my-4">
+    <h1 class="kiosk-title">Welcome to the Library</h1>
+    <p class="kiosk-lead">Touch a button to get started.</p>
+</div>
+
+<div class="row g-4 mt-2">
+    <div class="col-12 col-md-6">
+        <a class="btn btn-primary kiosk-tile w-100" asp-action="Checkout">
+            <span class="kiosk-icon" aria-hidden="true">📖</span>
+            Borrow an item
+            <small>Scan the code on the item</small>
+        </a>
+    </div>
+    <div class="col-12 col-md-6">
+        <a class="btn btn-success kiosk-tile w-100" asp-action="Account">
+            <span class="kiosk-icon" aria-hidden="true">👤</span>
+            My account
+            <small>Loans, fines and reservations</small>
+        </a>
+    </div>
+</div>
+
+<p class="text-center text-muted mt-5 kiosk-lead">
+    Need help? Please ask a member of staff.
+</p>

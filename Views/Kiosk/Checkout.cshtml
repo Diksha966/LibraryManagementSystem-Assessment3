@@ -1,0 +1,49 @@
+@using LibraryManagementSystem.ViewModels
+@model KioskCheckoutViewModel
+@{
+    ViewData["Title"] = "Borrow an item";
+    Layout = "_KioskLayout";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <h1 class="mb-1">Hello, @Model.BorrowerName</h1>
+        <p class="kiosk-lead">Scan the code on the item, or type it in.</p>
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            if (Model.Success)
+            {
+                <div class="alert alert-success kiosk-message" role="alert">
+                    <strong>✔ @Model.Message</strong><br />
+                    Please return it by <strong>@(Model.DueDate?.ToString("dddd d MMMM yyyy"))</strong>.
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger kiosk-message" role="alert">
+                    @Model.Message
+                </div>
+            }
+        }
+
+        <div class="card kiosk-card shadow-sm">
+            <div class="card-body p-4">
+                <form asp-action="Checkout" method="post" autocomplete="off">
+                    <label for="libraryCode" class="kiosk-label">Library code</label>
+                    <input id="libraryCode" name="libraryCode" class="form-control kiosk-input mb-4"
+                           placeholder="e.g. TY001" autofocus autocomplete="off"
+                           autocapitalize="characters" />
+
+                    <div class="d-grid gap-3 d-md-flex">
+                        <button type="submit" class="btn btn-primary kiosk-btn flex-fill">
+                            @(Model.Success ? "Borrow another item" : "Borrow")
+                        </button>
+                        <a asp-action="Account" class="btn btn-success kiosk-btn flex-fill d-flex align-items-center justify-content-center">My account</a>
+                        <a asp-action="Reset" class="btn btn-outline-secondary kiosk-btn flex-fill d-flex align-items-center justify-content-center">Finish</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

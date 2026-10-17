@@ -125,6 +125,22 @@
 
             </dl>
 
+            @* Person 3: reservations *@
+            @if (Model.Status == LibraryManagementSystem.Models.ItemStatus.Borrowed ||
+                 Model.Status == LibraryManagementSystem.Models.ItemStatus.Damaged ||
+                 Model.Status == LibraryManagementSystem.Models.ItemStatus.InTransit)
+            {
+                <div class="alert alert-warning d-flex flex-wrap justify-content-between align-items-center mb-0">
+                    <span>This item is not available right now. Join the queue and we will email you when it is ready.</span>
+                    <a asp-controller="Reserve"
+                       asp-action="Index"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-primary mt-2 mt-md-0">
+                        Reserve this item
+                    </a>
+                </div>
+            }
+
         </div>
     </div>
 

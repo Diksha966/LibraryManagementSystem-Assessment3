@@ -1,0 +1,7 @@
+Type,Title,Description,LibraryCode,Author,Genre,ISBN,ToyType,RecommendedAge,Artist,Year,Format,BranchCode
+Book,Dune,A science fiction epic set on the desert planet Arrakis.,BK100,Frank Herbert,Science Fiction,9780441172719,,,,,,CEN
+Book,"Good Omens","A comedy about the end of the world, with an angel and a demon.",BK101,Terry Pratchett and Neil Gaiman,Fantasy,,,,,,,NTH
+Toy,Wooden Train Set,A 40 piece wooden railway set.,TY100,,,,Building,4,,,,CEN
+Music,Kind of Blue,A landmark jazz album.,MU100,,,,,,Miles Davis,1959,CD,NTH
+Toy,Bad Row Example,Age is out of range and the code duplicates TY001.,TY001,,,,Puzzle,40,,,,CEN
+Game,Unknown Type,This row has an invalid type.,GM100,,,,,,,,,CEN

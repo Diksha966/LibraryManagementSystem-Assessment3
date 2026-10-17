@@ -1,0 +1,42 @@
+@using LibraryManagementSystem.ViewModels
+@model KioskSignInViewModel
+@{
+    ViewData["Title"] = "Sign in";
+    Layout = "_KioskLayout";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card kiosk-card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="mb-1">Who are you?</h1>
+                <p class="kiosk-lead">Enter your member number and the email address we have on file.</p>
+
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger kiosk-message" role="alert"></div>
+
+                <form asp-action="SignIn" method="post" autocomplete="off">
+                    <input type="hidden" asp-for="Next" />
+
+                    <div class="mb-4">
+                        <label asp-for="MemberNumber" class="kiosk-label"></label>
+                        <input asp-for="MemberNumber" class="form-control kiosk-input"
+                               inputmode="numeric" autofocus autocomplete="off" />
+                        <span asp-validation-for="MemberNumber" class="text-danger fs-5"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Email" class="kiosk-label"></label>
+                        <input asp-for="Email" class="form-control kiosk-input"
+                               type="email" inputmode="email" autocomplete="off" />
+                        <span asp-validation-for="Email" class="text-danger fs-5"></span>
+                    </div>
+
+                    <div class="d-grid gap-3 d-md-flex">
+                        <button type="submit" class="btn btn-primary kiosk-btn flex-fill">Continue</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary kiosk-btn flex-fill d-flex align-items-center justify-content-center">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

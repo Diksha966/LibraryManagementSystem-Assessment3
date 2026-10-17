@@ -1,0 +1,56 @@
+@using LibraryManagementSystem.Services
+@{
+    ViewData["Title"] = "Import Items";
+}
+
+<div class="container py-4" style="max-width: 900px;">
+
+    <h1 class="display-6 fw-bold">Import Library Items</h1>
+    <p class="text-muted">Add many books, toys and music items at once from a CSV file.</p>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h2 class="h5">Step 1: Choose a CSV file</h2>
+
+            <form asp-action="Preview" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <input type="file" name="file" accept=".csv,text/csv" class="form-control form-control-lg" required />
+                    <div class="form-text">Maximum 1 MB and @CsvItemImportService.MaxRows rows. You will see a preview before anything is saved.</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg">Upload and preview</button>
+                <a asp-action="Template" class="btn btn-outline-secondary btn-lg">Download template CSV</a>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="h5">File format</h2>
+            <p>The first row must be a header row. Column order does not matter.</p>
+
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr><th>Column</th><th>Used for</th><th>Notes</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Type</td><td>All</td><td>Book, Toy or Music (required)</td></tr>
+                        <tr><td>Title, Description, LibraryCode</td><td>All</td><td>Required. LibraryCode must be unique.</td></tr>
+                        <tr><td>Author, Genre, ISBN</td><td>Book</td><td>Author and Genre required</td></tr>
+                        <tr><td>ToyType, RecommendedAge</td><td>Toy</td><td>ToyType required. Age 0 to 18</td></tr>
+                        <tr><td>Artist, Year, Format</td><td>Music</td><td>Artist required. Year 1900 to 2100</td></tr>
+                        <tr><td>BranchCode</td><td>All</td><td>Optional. A branch code such as CEN or NTH. Blank uses the first active branch.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="mb-0 text-muted">Imported items start with the status Available. Rows with problems are skipped and listed in the preview.</p>
+        </div>
+    </div>
+</div>

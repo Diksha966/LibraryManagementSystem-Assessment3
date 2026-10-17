@@ -1,5 +1,6 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services;
 using LibraryManagementSystem.Services.Branches;
 using LibraryManagementSystem.Services.Exports;
 using LibraryManagementSystem.Services.Notifications;
@@ -19,6 +20,20 @@ builder.Services.AddHostedService<OverdueNotificationBackgroundService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<ITransferService, TransferService>();
 
+// Person 3: kiosk, reservations, CSV import and manager reports.
+// Session holds the signed-in kiosk patron and the pending CSV upload.
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+builder.Services.AddScoped<PatronService>();
+builder.Services.AddScoped<ReservationService>();
+builder.Services.AddScoped<CsvItemImportService>();
+builder.Services.AddScoped<ReportService>();
+
 // Register the Entity Framework Core database context.
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -36,6 +51,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

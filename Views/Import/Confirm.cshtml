@@ -1,0 +1,30 @@
+@using LibraryManagementSystem.Services
+@model (int Imported, List<ImportRow> Skipped)
+@{
+    ViewData["Title"] = "Import Complete";
+}
+
+<div class="container py-4" style="max-width: 800px;">
+
+    <h1 class="display-6 fw-bold">Import Complete</h1>
+
+    <div class="alert alert-success">
+        <strong>@Model.Imported</strong> @(Model.Imported == 1 ? "item was" : "items were") added to the catalogue.
+    </div>
+
+    @if (Model.Skipped.Any())
+    {
+        <div class="alert alert-warning">
+            <strong>@Model.Skipped.Count</strong> @(Model.Skipped.Count == 1 ? "row was" : "rows were") skipped:
+            <ul class="mb-0">
+                @foreach (var row in Model.Skipped)
+                {
+                    <li>Row @row.RowNumber (@row.Title): @(string.Join("; ", row.Errors))</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <a asp-controller="Items" asp-action="Index" class="btn btn-primary">View library items</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">Import another file</a>
+</div>

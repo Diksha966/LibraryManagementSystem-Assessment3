@@ -24,6 +24,9 @@ namespace LibraryManagementSystem.Data
         public DbSet<Branch> Branches { get; set; }
         public DbSet<ItemTransfer> ItemTransfers { get; set; }
 
+        // Person 3: reservation and waitlist queue
+        public DbSet<Reservation> Reservations { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -1,0 +1,96 @@
+@using LibraryManagementSystem.Services
+@model ImportPreview
+@{
+    ViewData["Title"] = "Import Preview";
+}
+
+<div class="container py-4">
+
+    <h1 class="display-6 fw-bold">Import Preview</h1>
+    <p class="text-muted">File: @ViewBag.FileName. Nothing has been saved yet.</p>
+
+    @if (Model.FileErrors.Any())
+    {
+        <div class="alert alert-danger">
+            <strong>This file cannot be imported:</strong>
+            <ul class="mb-0">
+                @foreach (var error in Model.FileErrors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
+
+        <a asp-action="Index" class="btn btn-primary">Choose another file</a>
+    }
+    else
+    {
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-md-3">
+                <div class="card border-0 bg-light"><div class="card-body">
+                    <h6 class="text-muted">Rows in file</h6><h2>@Model.Rows.Count</h2>
+                </div></div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 bg-light"><div class="card-body">
+                    <h6 class="text-muted">Ready to import</h6><h2 class="text-success">@Model.ValidCount</h2>
+                </div></div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="card border-0 bg-light"><div class="card-body">
+                    <h6 class="text-muted">Will be skipped</h6><h2 class="text-danger">@Model.ErrorCount</h2>
+                </div></div>
+            </div>
+        </div>
+
+        <div class="table-responsive mb-4">
+            <table class="table table-sm align-middle">
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Type</th>
+                        <th>Title</th>
+                        <th>Code</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <tr class="@(row.IsValid ? "" : "table-danger")">
+                            <td>@row.RowNumber</td>
+                            <td>@row.Type</td>
+                            <td>@row.Title</td>
+                            <td>@row.LibraryCode</td>
+                            <td>
+                                @if (row.IsValid)
+                                {
+                                    <span class="badge bg-success">OK</span>
+                                }
+                                else
+                                {
+                                    <ul class="mb-0 small">
+                                        @foreach (var error in row.Errors)
+                                        {
+                                            <li>@error</li>
+                                        }
+                                    </ul>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <form asp-action="Confirm" method="post" class="d-flex gap-2">
+            @if (Model.ValidCount > 0)
+            {
+                <button type="submit" class="btn btn-success btn-lg">
+                    Import @Model.ValidCount @(Model.ValidCount == 1 ? "item" : "items")
+                </button>
+            }
+            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Cancel</a>
+        </form>
+    }
+</div>

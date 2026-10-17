@@ -9,13 +9,16 @@ public class TransferService : ITransferService
 {
     private readonly LibraryDbContext _context;
     private readonly INotificationService _notificationService;
+    private readonly ReservationService _reservations;
 
     public TransferService(
         LibraryDbContext context,
-        INotificationService notificationService)
+        INotificationService notificationService,
+        ReservationService reservations)
     {
         _context = context;
         _notificationService = notificationService;
+        _reservations = reservations;
     }
 
     public async Task<TransferResult> RequestAsync(
@@ -189,9 +192,9 @@ public class TransferService : ITransferService
             branchId: transfer.ToBranchId,
             cancellationToken: cancellationToken);
 
-        // Integration point (Person 3, reservations): the item is now Available,
-        // so call ReservationService.NotifyNextAsync(transfer.ItemId) here once
-        // the reservations module is merged.
+        // Person 3 (reservations): the item is Available at its new branch,
+        // so the first person in its reservation queue is notified.
+        await _reservations.NotifyNextAsync(transfer.ItemId);
 
         return TransferResult.Ok(
             $"Transfer #{transfer.Id} received. \"{transfer.Item.Title}\" is now Available at {transfer.ToBranch?.Name}.",
@@ -244,6 +247,12 @@ public class TransferService : ITransferService
             entityId: transfer.Id,
             branchId: transfer.FromBranchId,
             cancellationToken: cancellationToken);
+
+        // Person 3 (reservations): a cancelled in-transit item is Available again.
+        if (wasInTransit && transfer.Item.Status == ItemStatus.Available)
+        {
+            await _reservations.NotifyNextAsync(transfer.ItemId);
+        }
 
         return TransferResult.Ok(
             wasInTransit

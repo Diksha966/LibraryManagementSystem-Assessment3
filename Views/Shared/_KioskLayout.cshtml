@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Library Kiosk</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        html { font-size: 20px; }
+        body.kiosk { background: #f4f6fb; min-height: 100vh; }
+        .kiosk-header {
+            background: #12355b; color: #fff;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1rem 1.5rem;
+        }
+        .kiosk-brand { color: #fff; font-size: 1.6rem; font-weight: 700; text-decoration: none; }
+        .kiosk-title { font-size: 2.6rem; font-weight: 700; }
+        .kiosk-lead { font-size: 1.5rem; color: #444; }
+        .kiosk-tile {
+            min-height: 220px; font-size: 2rem; font-weight: 700;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 1.25rem; text-decoration: none;
+        }
+        .kiosk-tile small { font-size: 1.15rem; font-weight: 400; margin-top: .5rem; }
+        .kiosk-icon { font-size: 3.5rem; line-height: 1; }
+        .kiosk-input { font-size: 2rem; padding: 1rem 1.25rem; min-height: 4.5rem; }
+        .kiosk-label { font-size: 1.4rem; font-weight: 600; }
+        .kiosk-btn { min-height: 4.5rem; font-size: 1.6rem; font-weight: 600; border-radius: 1rem; }
+        .kiosk-card { border-radius: 1.25rem; }
+        .kiosk-message { font-size: 1.5rem; border-radius: 1rem; }
+        .kiosk-table { font-size: 1.3rem; }
+        .kiosk-table th { font-size: 1.1rem; }
+        .btn:focus, .form-control:focus { outline: 4px solid #ffbf47; box-shadow: none; }
+    </style>
+</head>
+<body class="kiosk">
+    <header class="kiosk-header">
+        <a class="kiosk-brand" asp-controller="Kiosk" asp-action="Index">📚 Library Self-Service</a>
+        <a class="btn btn-outline-light btn-lg" asp-controller="Kiosk" asp-action="Reset">Finish &amp; sign out</a>
+    </header>
+
+    <main class="container py-4" role="main">
+        @RenderBody()
+    </main>
+
+    <script>
+        // Return to the home screen (and sign out) after 90 seconds of no touch/keyboard activity.
+        (function () {
+            var resetUrl = '@Url.Action("Reset", "Kiosk")';
+            var timer;
+            function restart() {
+                clearTimeout(timer);
+                timer = setTimeout(function () { window.location.href = resetUrl; }, 90000);
+            }
+            ['click', 'touchstart', 'keydown', 'mousemove'].forEach(function (name) {
+                document.addEventListener(name, restart, { passive: true });
+            });
+            restart();
+        })();
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

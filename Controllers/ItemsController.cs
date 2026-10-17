@@ -1,5 +1,6 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services;
 using LibraryManagementSystem.Services.Branches;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,15 +15,18 @@ namespace LibraryManagementSystem.Controllers
         private readonly LibraryDbContext _context;
         private readonly IBranchService _branchService;
         private readonly ITransferService _transferService;
+        private readonly ReservationService _reservations;
 
         public ItemsController(
             LibraryDbContext context,
             IBranchService branchService,
-            ITransferService transferService)
+            ITransferService transferService,
+            ReservationService reservations)
         {
             _context = context;
             _branchService = branchService;
             _transferService = transferService;
+            _reservations = reservations;
         }
 
         // GET: Items?branchId=2&status=Available
@@ -290,6 +294,8 @@ namespace LibraryManagementSystem.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            var previousStatus = item.Status;
+
             item.Title = model.Title;
             item.Description = model.Description;
             item.LibraryCode = model.LibraryCode;
@@ -316,6 +322,14 @@ namespace LibraryManagementSystem.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+            // Person 3: the item became Available again (for example after a
+            // repair), so tell the next person in its reservation queue.
+            if (previousStatus != ItemStatus.Available &&
+                item.Status == ItemStatus.Available)
+            {
+                await _reservations.NotifyNextAsync(item.Id);
+            }
 
             return RedirectToAction(nameof(Index));
         }
