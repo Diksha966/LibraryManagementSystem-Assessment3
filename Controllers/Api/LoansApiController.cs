@@ -51,6 +51,14 @@ public class LoansApiController : ControllerBase
             .OrderByDescending(l => l.BorrowedDate)
             .ToListAsync();
 
+        // Person 1: a loan belongs to the branch that holds its item.
+        if (branchId.HasValue)
+        {
+            loans = loans
+                .Where(l => itemLookup.TryGetValue(l.ItemId, out var it) && it.BranchId == branchId.Value)
+                .ToList();
+        }
+
         var response = loans.Select(l =>
         {
             itemLookup.TryGetValue(l.ItemId, out var item);
@@ -69,7 +77,7 @@ public class LoansApiController : ControllerBase
                 l.ReturnedDate,
                 Status = l.Status.ToString(),
                 IsOverdue = l.DueDate.Date < today && l.Status != LoanStatus.Returned,
-                BranchId = branchId
+                BranchId = item?.BranchId
             };
         });
 
@@ -93,6 +101,11 @@ public class LoansApiController : ControllerBase
             .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == loan.ItemId);
 
+        if (branchId.HasValue && item?.BranchId != branchId.Value)
+        {
+            return NotFound();
+        }
+
         return Ok(new
         {
             loan.Id,
@@ -106,7 +119,7 @@ public class LoansApiController : ControllerBase
             loan.DueDate,
             loan.ReturnedDate,
             Status = loan.Status.ToString(),
-            BranchId = branchId
+            BranchId = item?.BranchId
         });
     }
 }

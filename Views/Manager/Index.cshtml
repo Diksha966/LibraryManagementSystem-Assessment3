@@ -120,7 +120,62 @@
                     </div>
                 </div>
 
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 bg-light">
+                        <div class="card-body">
+                            <h6 class="text-muted">In Transit</h6>
+                            <h2>@ViewBag.InTransitItems</h2>
+                        </div>
+                    </div>
+                </div>
+
             </div>
+        </div>
+    </div>
+
+    <!-- Person 1: Inventory by Branch -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+                <h2 class="h4 mb-0">Inventory by Branch</h2>
+                <span class="text-muted">Open transfers: <strong>@ViewBag.OpenTransfers</strong></span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-2">
+                    <thead>
+                        <tr>
+                            <th>Branch</th>
+                            <th class="text-end">Total</th>
+                            <th class="text-end">Available</th>
+                            <th class="text-end">Borrowed</th>
+                            <th class="text-end">Damaged</th>
+                            <th class="text-end">Destroyed</th>
+                            <th class="text-end">In transit</th>
+                            <th class="text-end">Outgoing</th>
+                            <th class="text-end">Incoming</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in (List<LibraryManagementSystem.Models.BranchInventorySummary>)ViewBag.BranchSummary)
+                        {
+                            <tr>
+                                <td>@b.Name @(b.IsActive ? "" : "(inactive)")</td>
+                                <td class="text-end">@b.TotalItems</td>
+                                <td class="text-end">@b.Available</td>
+                                <td class="text-end">@b.Borrowed</td>
+                                <td class="text-end">@b.Damaged</td>
+                                <td class="text-end">@b.Destroyed</td>
+                                <td class="text-end">@b.InTransit</td>
+                                <td class="text-end">@b.Outgoing</td>
+                                <td class="text-end">@b.Incoming</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <a asp-controller="Branches" asp-action="Index" class="btn btn-outline-primary btn-sm">Open Branches</a>
         </div>
     </div>
 

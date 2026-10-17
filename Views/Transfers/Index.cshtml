@@ -1,0 +1,68 @@
+@model IEnumerable<LibraryManagementSystem.Models.ItemTransfer>
+
+@{
+    ViewData["Title"] = "Transfers";
+    var status = ViewBag.Status as LibraryManagementSystem.Models.TransferStatus?;
+    bool openOnly = ViewBag.OpenOnly ?? false;
+}
+
+<h1>Inter-branch Transfers</h1>
+<p class="text-muted">Request &rarr; Dispatch &rarr; Receive. Items are locked while a transfer is open.</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Request Transfer</a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-controller="Branches" asp-action="Index" class="btn btn-outline-secondary">Branches</a>
+    }
+</p>
+
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-12 col-md-4">
+        <label class="form-label" for="branchId">Branch</label>
+        <select name="branchId" id="branchId" class="form-select" asp-items="ViewBag.Branches">
+            <option value="">All branches</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-4">
+        <label class="form-label" for="status">Status</label>
+        <select name="status" id="status" class="form-select"
+                asp-items="Html.GetEnumSelectList<LibraryManagementSystem.Models.TransferStatus>()">
+            <option value="">All statuses</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-auto">
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="openOnly" id="openOnly" value="true" checked="@openOnly" />
+            <label class="form-check-label" for="openOnly">Open only</label>
+        </div>
+    </div>
+    <div class="col-12 col-md-auto">
+        <button type="submit" class="btn btn-secondary">Filter</button>
+        <a asp-action="Index" class="btn btn-link">Clear</a>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No transfers match these filters.</div>
+}
+else
+{
+    <partial name="_TransferTable" model="Model" />
+}
+
+@section Scripts {
+    <script>
+        // Keep the chosen status selected after filtering.
+        (function () {
+            var s = '@(status.HasValue ? ((int)status.Value).ToString() : "")';
+            if (s !== '') { document.getElementById('status').value = s; }
+        })();
+    </script>
+}

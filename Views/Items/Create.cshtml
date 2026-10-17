@@ -40,11 +40,20 @@
         <span asp-validation-for="LibraryCode" class="text-danger"></span>
     </div>
 
+    <!-- Person 1: every item belongs to a branch -->
+    <div class="mb-3">
+        <label asp-for="BranchId" class="form-label"></label>
+        <select asp-for="BranchId" class="form-select" asp-items="ViewBag.Branches">
+            <option value="0">Choose a branch&hellip;</option>
+        </select>
+        <span asp-validation-for="BranchId" class="text-danger"></span>
+    </div>
+
     <div class="mb-3">
         <label asp-for="Status" class="form-label"></label>
         <select asp-for="Status"
                 class="form-select"
-                asp-items="Html.GetEnumSelectList<LibraryManagementSystem.Models.ItemStatus>()">
+                asp-items="Html.GetEnumSelectList<LibraryManagementSystem.Models.ItemStatus>().Where(s => s.Value != ((int)LibraryManagementSystem.Models.ItemStatus.InTransit).ToString())">
         </select>
         <span asp-validation-for="Status" class="text-danger"></span>
     </div>

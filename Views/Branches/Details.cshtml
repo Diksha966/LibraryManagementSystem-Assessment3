@@ -1,0 +1,75 @@
+@model LibraryManagementSystem.Models.Branch
+
+@{
+    ViewData["Title"] = Model.Name;
+    var items = (List<LibraryManagementSystem.Models.Item>)ViewBag.Items;
+    var transfers = (List<LibraryManagementSystem.Models.ItemTransfer>)ViewBag.Transfers;
+}
+
+<h1>@Model.Name <small class="text-muted">(@Model.Code)</small></h1>
+<p class="text-muted mb-1">@Model.Address</p>
+<p>
+    @if (Model.IsActive)
+    {
+        <span class="badge bg-success">Active</span>
+    }
+    else
+    {
+        <span class="badge bg-secondary">Inactive</span>
+    }
+</p>
+
+<h2 class="h4 mt-4">Items at this branch (@items.Count)</h2>
+
+@if (!items.Any())
+{
+    <p class="text-muted">No items are held at this branch.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead>
+                <tr><th>Title</th><th>Library code</th><th>Type</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var item in items)
+                {
+                    <tr>
+                        <td>@item.Title</td>
+                        <td><strong>@item.LibraryCode</strong></td>
+                        <td>@item.GetType().Name</td>
+                        <td><partial name="_ItemStatusBadge" model="item.Status" /></td>
+                        <td>
+                            @if ((User.IsInRole("Admin") || User.IsInRole("Reception")) &&
+                                 item.Status == LibraryManagementSystem.Models.ItemStatus.Available)
+                            {
+                                <a asp-controller="Transfers" asp-action="Create" asp-route-itemId="@item.Id"
+                                   class="btn btn-outline-primary btn-sm">Transfer</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<h2 class="h4 mt-4">Recent transfers</h2>
+
+@if (!transfers.Any())
+{
+    <p class="text-muted">No transfers to or from this branch yet.</p>
+}
+else
+{
+    <partial name="~/Views/Transfers/_TransferTable.cshtml" model="transfers" />
+}
+
+<div class="mt-3">
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    }
+    <a asp-action="Index" class="btn btn-secondary">Back to Branches</a>
+</div>

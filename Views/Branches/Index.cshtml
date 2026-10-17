@@ -1,0 +1,87 @@
+@model IEnumerable<LibraryManagementSystem.Models.BranchInventorySummary>
+
+@{
+    ViewData["Title"] = "Branches";
+}
+
+<h1>Branches</h1>
+<p class="text-muted">Stock held at each branch and transfers on the way in or out.</p>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<p>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="Create" class="btn btn-primary">Add Branch</a>
+    }
+    @if (User.IsInRole("Admin") || User.IsInRole("Reception"))
+    {
+        <a asp-controller="Transfers" asp-action="Index" class="btn btn-outline-primary">Transfers</a>
+    }
+</p>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Branch</th>
+                <th>Code</th>
+                <th class="text-end">Total items</th>
+                <th class="text-end">Available</th>
+                <th class="text-end">Borrowed</th>
+                <th class="text-end">Damaged</th>
+                <th class="text-end">Destroyed</th>
+                <th class="text-end">In transit</th>
+                <th class="text-end">Outgoing</th>
+                <th class="text-end">Incoming</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model)
+            {
+                <tr class="@(b.IsActive ? "" : "text-muted")">
+                    <td>
+                        <strong>@b.Name</strong>
+                        @if (!b.IsActive)
+                        {
+                            <span class="badge bg-secondary ms-1">Inactive</span>
+                        }
+                    </td>
+                    <td>@b.Code</td>
+                    <td class="text-end">@b.TotalItems</td>
+                    <td class="text-end">@b.Available</td>
+                    <td class="text-end">@b.Borrowed</td>
+                    <td class="text-end">@b.Damaged</td>
+                    <td class="text-end">@b.Destroyed</td>
+                    <td class="text-end">@b.InTransit</td>
+                    <td class="text-end">@b.Outgoing</td>
+                    <td class="text-end">@b.Incoming</td>
+                    <td class="text-nowrap">
+                        <a asp-action="Details" asp-route-id="@b.BranchId" class="btn btn-info btn-sm">Details</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@b.BranchId" class="btn btn-warning btn-sm">Edit</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr class="fw-bold">
+                <td colspan="2">All branches</td>
+                <td class="text-end">@Model.Sum(b => b.TotalItems)</td>
+                <td class="text-end">@Model.Sum(b => b.Available)</td>
+                <td class="text-end">@Model.Sum(b => b.Borrowed)</td>
+                <td class="text-end">@Model.Sum(b => b.Damaged)</td>
+                <td class="text-end">@Model.Sum(b => b.Destroyed)</td>
+                <td class="text-end">@Model.Sum(b => b.InTransit)</td>
+                <td class="text-end" colspan="2">@Model.Sum(b => b.Outgoing) open transfers</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</div>

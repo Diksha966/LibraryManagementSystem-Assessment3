@@ -37,6 +37,16 @@
                                aria-label="Search library items" />
                     </div>
 
+                    <!-- Person 1: search one branch or all branches -->
+                    <div class="col-12 col-md-3">
+                        <select name="branchId"
+                                class="form-select form-select-lg"
+                                aria-label="Branch"
+                                asp-items="ViewBag.Branches">
+                            <option value="">All branches</option>
+                        </select>
+                    </div>
+
                     <div class="col-12 col-md-auto">
                         <button type="submit"
                                 class="btn btn-primary btn-lg w-100">
@@ -102,33 +112,12 @@
                             <p class="mb-3">
                                 <strong>Status:</strong>
 
-                                @if (item.Status ==
-                                    LibraryManagementSystem.Models.ItemStatus.Available)
-                                {
-                                    <span class="badge bg-success">
-                                        Available
-                                    </span>
-                                }
-                                else if (item.Status ==
-                                    LibraryManagementSystem.Models.ItemStatus.Borrowed)
-                                {
-                                    <span class="badge bg-warning text-dark">
-                                        Borrowed
-                                    </span>
-                                }
-                                else if (item.Status ==
-                                    LibraryManagementSystem.Models.ItemStatus.Damaged)
-                                {
-                                    <span class="badge bg-danger">
-                                        Damaged
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-dark">
-                                        Destroyed
-                                    </span>
-                                }
+                                <partial name="_ItemStatusBadge" model="item.Status" />
+                            </p>
+
+                            <p class="mb-3">
+                                <strong>Branch:</strong>
+                                @(item.Branch?.Name ?? "–")
                             </p>
 
                             <div class="mt-auto">

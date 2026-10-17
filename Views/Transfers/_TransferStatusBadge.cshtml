@@ -1,0 +1,17 @@
+@model LibraryManagementSystem.Models.TransferStatus
+
+@switch (Model)
+{
+    case LibraryManagementSystem.Models.TransferStatus.Requested:
+        <span class="badge bg-primary">Requested</span>
+        break;
+    case LibraryManagementSystem.Models.TransferStatus.InTransit:
+        <span class="badge bg-warning text-dark">In transit</span>
+        break;
+    case LibraryManagementSystem.Models.TransferStatus.Received:
+        <span class="badge bg-success">Received</span>
+        break;
+    default:
+        <span class="badge bg-secondary">Cancelled</span>
+        break;
+}

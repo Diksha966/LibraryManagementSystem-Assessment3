@@ -1,0 +1,21 @@
+@model LibraryManagementSystem.Models.Branch
+
+@{
+    ViewData["Title"] = "Add Branch";
+}
+
+<h1>Add Branch</h1>
+<hr />
+
+<form asp-action="Create" method="post" style="max-width: 40rem;">
+    <partial name="_BranchForm" model="Model" />
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to Branches</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

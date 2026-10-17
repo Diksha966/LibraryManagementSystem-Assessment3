@@ -1,0 +1,21 @@
+@model LibraryManagementSystem.Models.ItemStatus
+
+@* Person 1: one place to show an item status, including the new In transit status. *@
+@switch (Model)
+{
+    case LibraryManagementSystem.Models.ItemStatus.Available:
+        <span class="badge bg-success">Available</span>
+        break;
+    case LibraryManagementSystem.Models.ItemStatus.Borrowed:
+        <span class="badge bg-warning text-dark">Borrowed</span>
+        break;
+    case LibraryManagementSystem.Models.ItemStatus.Damaged:
+        <span class="badge bg-danger">Damaged</span>
+        break;
+    case LibraryManagementSystem.Models.ItemStatus.InTransit:
+        <span class="badge bg-info text-dark">In transit</span>
+        break;
+    default:
+        <span class="badge bg-dark">Destroyed</span>
+        break;
+}
