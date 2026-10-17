@@ -2,20 +2,51 @@
 
 @{
     ViewData["Title"] = "Library Items";
+    var openTransferItemIds = ViewBag.OpenTransferItemIds as HashSet<int> ?? new HashSet<int>();
+    var status = ViewBag.Status as LibraryManagementSystem.Models.ItemStatus?;
 }
 
 <h1>Library Items</h1>
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
 <p>
     <a asp-action="Create" class="btn btn-primary">Add New Item</a>
+    <a asp-controller="Transfers" asp-action="Index" class="btn btn-outline-primary">Transfers</a>
+    <a asp-controller="Branches" asp-action="Index" class="btn btn-outline-secondary">Branches</a>
     <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Home</a>
 </p>
+
+<!-- Person 1: filter inventory by branch and status -->
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-12 col-md-4">
+        <label class="form-label" for="branchId">Branch</label>
+        <select name="branchId" id="branchId" class="form-select" asp-items="ViewBag.Branches">
+            <option value="">All branches</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-4">
+        <label class="form-label" for="status">Status</label>
+        <select name="status" id="status" class="form-select"
+                asp-items="Html.GetEnumSelectList<LibraryManagementSystem.Models.ItemStatus>()">
+            <option value="">All statuses</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-auto">
+        <button type="submit" class="btn btn-secondary">Filter</button>
+        <a asp-action="Index" class="btn btn-link">Clear</a>
+    </div>
+</form>
 
 <table class="table">
     <thead>
         <tr>
             <th>Title</th>
             <th>Library Code</th>
+            <th>Branch</th>
             <th>Status</th>
             <th>Actions</th>
         </tr>
@@ -29,7 +60,15 @@
                 <td>
                     <strong>@item.LibraryCode</strong>
                 </td>
-                <td>@item.Status</td>
+                <td>@(item.Branch?.Name ?? "–")</td>
+                <td>
+                    <partial name="_ItemStatusBadge" model="item.Status" />
+                    @if (openTransferItemIds.Contains(item.Id) &&
+                         item.Status != LibraryManagementSystem.Models.ItemStatus.InTransit)
+                    {
+                        <span class="badge bg-primary">Transfer requested</span>
+                    }
+                </td>
                 <td>
                     <a asp-action="Details"
                        asp-route-id="@item.Id"
@@ -43,6 +82,17 @@
                         Edit
                     </a>
 
+                    @if (item.Status == LibraryManagementSystem.Models.ItemStatus.Available &&
+                         !openTransferItemIds.Contains(item.Id))
+                    {
+                        <a asp-controller="Transfers"
+                           asp-action="Create"
+                           asp-route-itemId="@item.Id"
+                           class="btn btn-outline-primary btn-sm">
+                            Transfer
+                        </a>
+                    }
+
                     <a asp-action="Delete"
                        asp-route-id="@item.Id"
                        class="btn btn-danger btn-sm">
@@ -53,3 +103,18 @@
         }
     </tbody>
 </table>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No items match these filters.</div>
+}
+
+@section Scripts {
+    <script>
+        // Keep the chosen status selected after filtering.
+        (function () {
+            var s = '@(status.HasValue ? ((int)status.Value).ToString() : "")';
+            if (s !== '') { document.getElementById('status').value = s; }
+        })();
+    </script>
+}

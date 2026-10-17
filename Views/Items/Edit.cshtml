@@ -42,6 +42,18 @@
         <span asp-validation-for="LibraryCode" class="text-danger"></span>
     </div>
 
+    <!-- Person 1: branch is read-only; use a transfer to move the item -->
+    <div class="mb-3">
+        <label class="form-label">Branch</label>
+        <div class="input-group">
+            <input class="form-control" value="@Model.BranchName" readonly />
+            <a asp-controller="Transfers" asp-action="Create" asp-route-itemId="@Model.Id"
+               class="btn btn-outline-primary">Transfer to another branch</a>
+        </div>
+        <input type="hidden" asp-for="BranchId" />
+        <div class="form-text">An item changes branch only when a transfer is received.</div>
+    </div>
+
     <div class="mb-3">
         <label asp-for="Status" class="form-label"></label>
         <select asp-for="Status"

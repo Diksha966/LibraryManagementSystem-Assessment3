@@ -643,6 +643,32 @@ The application has been successfully compiled using:
 
 dotnet build
 
+Multi-Branch Inventory and Inter-Branch Transfers (Person 1)
+
+The library operates several branches. Every item belongs to one branch, and staff move items between branches with a tracked transfer.
+
+One-time setup after pulling these changes:
+
+dotnet restore
+dotnet ef migrations add AddBranchesAndTransfers
+dotnet ef database update
+dotnet run
+
+Seeded branches: Central Library (CEN) and Northside Branch (NTH). BK001 and TY001 are at Central Library; MU001 is at Northside Branch.
+
+Where to find it:
+
+Branches (Admin; Manager can view): Branches menu, /Branches
+Transfers (Admin and Reception): Transfers menu, /Transfers
+Branch filter on Library Items, the Public Library search and the API (?branchId=)
+Inventory by Branch table on the Manager Dashboard
+
+Transfer workflow:
+
+Request (item must be Available) -> Dispatch (item becomes In transit and cannot be borrowed) -> Receive (item moves to the new branch and becomes Available). A Requested or In Transit transfer can be cancelled; the item stays at, or returns to, the source branch. Every step is recorded with the staff user and time, and logged as a notification.
+
+Full rules, file list and the transfer test script (TC-T01 to TC-T15): Docs/Person1-Multi-Branch-and-Transfers.md
+
 Project Structure
 
 LibraryManagementSystem

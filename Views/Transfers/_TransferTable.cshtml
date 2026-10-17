@@ -1,0 +1,40 @@
+@model IEnumerable<LibraryManagementSystem.Models.ItemTransfer>
+
+<div class="table-responsive">
+    <table class="table table-sm align-middle">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Item</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+                <th>Requested</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.Id</td>
+                    <td>
+                        @t.Item?.Title
+                        <div class="small text-muted">@t.Item?.LibraryCode</div>
+                    </td>
+                    <td>@t.FromBranch?.Name</td>
+                    <td>@t.ToBranch?.Name</td>
+                    <td><partial name="~/Views/Transfers/_TransferStatusBadge.cshtml" model="t.Status" /></td>
+                    <td class="text-nowrap">@t.RequestedAt.ToString("d MMM yyyy HH:mm")</td>
+                    <td>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Reception"))
+                        {
+                            <a asp-controller="Transfers" asp-action="Details" asp-route-id="@t.Id"
+                               class="btn btn-info btn-sm">Open</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

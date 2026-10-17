@@ -67,6 +67,25 @@
                                     Library Items
                                 </a>
                             </li>
+
+                            @* Person 1: branches and transfers *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Branches"
+                                   asp-action="Index">
+                                    Branches
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark"
+                                   asp-area=""
+                                   asp-controller="Transfers"
+                                   asp-action="Index">
+                                    Transfers
+                                </a>
+                            </li>
                         }
 
                         <!-- Reception navigation -->
@@ -98,6 +117,19 @@
                                     Fines
                                 </a>
                             </li>
+
+                            @if (!User.IsInRole("Admin"))
+                            {
+                                @* Person 1: branch staff handle transfers *@
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                       asp-area=""
+                                       asp-controller="Transfers"
+                                       asp-action="Index">
+                                        Transfers
+                                    </a>
+                                </li>
+                            }
                         }
 
                         <!-- Manager navigation -->
@@ -111,6 +143,19 @@
                                     Manager Dashboard
                                 </a>
                             </li>
+
+                            @if (!User.IsInRole("Admin"))
+                            {
+                                @* Person 1: managers can view branch stock *@
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                       asp-area=""
+                                       asp-controller="Branches"
+                                       asp-action="Index">
+                                        Branches
+                                    </a>
+                                </li>
+                            }
                         }
 
                         <!-- Public portal -->

@@ -42,33 +42,14 @@
                     Status
                 </dt>
                 <dd class="col-sm-8">
-                    @if (Model.Status ==
-                        LibraryManagementSystem.Models.ItemStatus.Available)
-                    {
-                        <span class="badge bg-success">
-                            Available
-                        </span>
-                    }
-                    else if (Model.Status ==
-                        LibraryManagementSystem.Models.ItemStatus.Borrowed)
-                    {
-                        <span class="badge bg-warning text-dark">
-                            Borrowed
-                        </span>
-                    }
-                    else if (Model.Status ==
-                        LibraryManagementSystem.Models.ItemStatus.Damaged)
-                    {
-                        <span class="badge bg-danger">
-                            Damaged
-                        </span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-dark">
-                            Destroyed
-                        </span>
-                    }
+                    <partial name="_ItemStatusBadge" model="Model.Status" />
+                </dd>
+
+                <dt class="col-sm-4">
+                    Branch
+                </dt>
+                <dd class="col-sm-8">
+                    @(Model.Branch?.Name ?? "–")
                 </dd>
 
                 @if (Model is LibraryManagementSystem.Models.Book book)

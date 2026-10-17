@@ -1,0 +1,54 @@
+@model LibraryManagementSystem.Models.TransferCreateViewModel
+
+@{
+    ViewData["Title"] = "Request Transfer";
+    var item = ViewBag.Item as LibraryManagementSystem.Models.Item;
+}
+
+<h1>Request Transfer</h1>
+<p class="text-muted">Move an Available item from its current branch to another branch.</p>
+<hr />
+
+@if (item != null)
+{
+    <div class="card bg-light mb-3" style="max-width: 40rem;">
+        <div class="card-body py-2">
+            <strong>@item.Title</strong> (@item.LibraryCode)<br />
+            Currently at <strong>@(item.Branch?.Name ?? "unknown branch")</strong> &middot;
+            <partial name="_ItemStatusBadge" model="item.Status" />
+        </div>
+    </div>
+}
+
+<form asp-action="Create" method="post" style="max-width: 40rem;">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <div class="mb-3">
+        <label asp-for="LibraryCode" class="form-label"></label>
+        <input asp-for="LibraryCode" class="form-control" placeholder="e.g. TY001" autofocus />
+        <span asp-validation-for="LibraryCode" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ToBranchId" class="form-label"></label>
+        <select asp-for="ToBranchId" class="form-select" asp-items="ViewBag.Branches">
+            <option value="0">Choose a branch&hellip;</option>
+        </select>
+        <span asp-validation-for="ToBranchId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Reason" class="form-label"></label>
+        <input asp-for="Reason" class="form-control" placeholder="e.g. Requested by Northside for a school visit" />
+        <span asp-validation-for="Reason" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Request Transfer</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to Transfers</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

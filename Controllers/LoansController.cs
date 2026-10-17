@@ -1,5 +1,6 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services.Branches;
 using LibraryManagementSystem.Services.Notifications;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,16 @@ namespace LibraryManagementSystem.Controllers
     {
         private readonly LibraryDbContext _context;
         private readonly INotificationService _notificationService;
+        private readonly ITransferService _transferService;
 
         public LoansController(
             LibraryDbContext context,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            ITransferService transferService)
         {
             _context = context;
             _notificationService = notificationService;
+            _transferService = transferService;
         }
 
         // GET: Loans
@@ -97,11 +101,26 @@ namespace LibraryManagementSystem.Controllers
                         "LibraryCode",
                         "No item was found with that library code.");
                 }
+                else if (item.Status == ItemStatus.InTransit)
+                {
+                    // Person 1: dispatched items are locked until received.
+                    ModelState.AddModelError(
+                        "LibraryCode",
+                        "This item is in transit between branches and cannot be borrowed until it is received.");
+                }
                 else if (item.Status != ItemStatus.Available)
                 {
                     ModelState.AddModelError(
                         "LibraryCode",
                         "This item is not available for borrowing.");
+                }
+                else if (await _transferService.HasOpenTransferAsync(item.Id))
+                {
+                    // Person 1: an item waiting to be dispatched is also locked.
+                    ModelState.AddModelError(
+                        "LibraryCode",
+                        "This item has been requested for transfer to another branch. " +
+                        "Cancel the transfer before lending it.");
                 }
             }
 
@@ -136,7 +155,8 @@ namespace LibraryManagementSystem.Controllers
                     message: $"{borrower?.Name} borrowed {item.Title} ({item.LibraryCode}).",
                     eventKey: $"loan-borrowed-{loan.Id}",
                     entityType: "Loan",
-                    entityId: loan.Id);
+                    entityId: loan.Id,
+                    branchId: item.BranchId);
 
                 return RedirectToAction(nameof(Index));
             }

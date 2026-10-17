@@ -1,5 +1,6 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services.Branches;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +11,14 @@ namespace LibraryManagementSystem.Controllers
     public class ManagerController : Controller
     {
         private readonly LibraryDbContext _context;
+        private readonly IBranchService _branchService;
 
-        public ManagerController(LibraryDbContext context)
+        public ManagerController(
+            LibraryDbContext context,
+            IBranchService branchService)
         {
             _context = context;
+            _branchService = branchService;
         }
 
         public async Task<IActionResult> Index()
@@ -61,6 +66,18 @@ namespace LibraryManagementSystem.Controllers
                 .CountAsync(i =>
                     i.Status == ItemStatus.Destroyed);
 
+            // Person 1: multi-branch statistics
+            var inTransitItems = await _context.Items
+                .CountAsync(i =>
+                    i.Status == ItemStatus.InTransit);
+
+            var openTransfers = await _context.ItemTransfers
+                .CountAsync(t =>
+                    t.Status == TransferStatus.Requested ||
+                    t.Status == TransferStatus.InTransit);
+
+            var branchSummary = await _branchService.GetInventorySummaryAsync();
+
             // Fine statistics
             var totalFines = await _context.Fines
                 .CountAsync();
@@ -104,6 +121,9 @@ namespace LibraryManagementSystem.Controllers
             ViewBag.BorrowedItems = borrowedItems;
             ViewBag.DamagedItems = damagedItems;
             ViewBag.DestroyedItems = destroyedItems;
+            ViewBag.InTransitItems = inTransitItems;
+            ViewBag.OpenTransfers = openTransfers;
+            ViewBag.BranchSummary = branchSummary;
 
             ViewBag.TotalFines = totalFines;
             ViewBag.PaidFines = paidFines;

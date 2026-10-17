@@ -24,6 +24,14 @@ public class ItemFormViewModel
     [Required]
     public ItemStatus Status { get; set; } = ItemStatus.Available;
 
+    // Person 1: branch chosen when the item is created. On Edit it is shown
+    // read-only, because an item only changes branch through a transfer.
+    [Range(1, int.MaxValue, ErrorMessage = "Please choose a branch.")]
+    [Display(Name = "Branch")]
+    public int BranchId { get; set; }
+
+    public string? BranchName { get; set; }
+
     // Book
     [StringLength(100)]
     public string Author { get; set; } = string.Empty;

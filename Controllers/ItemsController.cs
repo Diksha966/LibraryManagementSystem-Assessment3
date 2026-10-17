@@ -1,7 +1,9 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services.Branches;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagementSystem.Controllers
@@ -10,36 +12,63 @@ namespace LibraryManagementSystem.Controllers
     public class ItemsController : Controller
     {
         private readonly LibraryDbContext _context;
+        private readonly IBranchService _branchService;
+        private readonly ITransferService _transferService;
 
-        public ItemsController(LibraryDbContext context)
+        public ItemsController(
+            LibraryDbContext context,
+            IBranchService branchService,
+            ITransferService transferService)
         {
             _context = context;
+            _branchService = branchService;
+            _transferService = transferService;
         }
 
-        // GET: Items
-        public async Task<IActionResult> Index()
+        // GET: Items?branchId=2&status=Available
+        public async Task<IActionResult> Index(int? branchId, ItemStatus? status)
         {
             // Query only concrete item types.
             // Item is abstract, so we do not query base Item records.
             var books = await _context.Books
                 .AsNoTracking()
+                .Include(b => b.Branch)
                 .ToListAsync();
 
             var toys = await _context.Toys
                 .AsNoTracking()
+                .Include(t => t.Branch)
                 .ToListAsync();
 
             var music = await _context.Music
                 .AsNoTracking()
+                .Include(m => m.Branch)
                 .ToListAsync();
 
             var items = books.Cast<Item>()
                 .Concat(toys.Cast<Item>())
-                .Concat(music.Cast<Item>())
-                .OrderBy(i => i.Title)
-                .ToList();
+                .Concat(music.Cast<Item>());
 
-            return View(items);
+            // Person 1: filter the inventory by branch and status.
+            if (branchId.HasValue)
+                items = items.Where(i => i.BranchId == branchId.Value);
+
+            if (status.HasValue)
+                items = items.Where(i => i.Status == status.Value);
+
+            ViewBag.BranchId = branchId;
+            ViewBag.Status = status;
+            ViewBag.Branches = new SelectList(
+                await _branchService.GetAllBranchesAsync(), "Id", "Name", branchId);
+
+            ViewBag.OpenTransferItemIds = (await _context.ItemTransfers
+                .AsNoTracking()
+                .Where(t => t.Status == TransferStatus.Requested || t.Status == TransferStatus.InTransit)
+                .Select(t => t.ItemId)
+                .ToListAsync())
+                .ToHashSet();
+
+            return View(items.OrderBy(i => i.Title).ToList());
         }
 
         // GET: Items/Details/5
@@ -53,13 +82,31 @@ namespace LibraryManagementSystem.Controllers
             if (item == null)
                 return NotFound();
 
+            // Person 1: transfer history for this item.
+            ViewBag.Transfers = await _context.ItemTransfers
+                .AsNoTracking()
+                .Include(t => t.FromBranch)
+                .Include(t => t.ToBranch)
+                .Where(t => t.ItemId == item.Id)
+                .OrderByDescending(t => t.RequestedAt)
+                .ToListAsync();
+
             return View(item);
         }
 
         // GET: Items/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View(new ItemFormViewModel());
+            var branches = await _branchService.GetActiveBranchesAsync();
+
+            var model = new ItemFormViewModel
+            {
+                BranchId = branches.FirstOrDefault()?.Id ?? 0
+            };
+
+            await PopulateBranchesAsync(model.BranchId);
+
+            return View(model);
         }
 
         // POST: Items/Create
@@ -69,8 +116,30 @@ namespace LibraryManagementSystem.Controllers
         {
             ValidateItemType(model);
 
+            // Person 1: new items must go to an active branch, and the
+            // In transit status is only ever set by a transfer.
+            bool branchOk = await _context.Branches
+                .AnyAsync(b => b.Id == model.BranchId && b.IsActive);
+
+            if (!branchOk)
+            {
+                ModelState.AddModelError(
+                    nameof(model.BranchId),
+                    "Please choose an active branch.");
+            }
+
+            if (model.Status == ItemStatus.InTransit)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Status),
+                    "In transit is set automatically when a transfer is dispatched.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                await PopulateBranchesAsync(model.BranchId);
                 return View(model);
+            }
 
             Item item;
 
@@ -119,8 +188,11 @@ namespace LibraryManagementSystem.Controllers
                         "ItemType",
                         "Please select a valid item type.");
 
+                    await PopulateBranchesAsync(model.BranchId);
                     return View(model);
             }
+
+            item.BranchId = model.BranchId;
 
             _context.Items.Add(item);
             await _context.SaveChangesAsync();
@@ -145,7 +217,9 @@ namespace LibraryManagementSystem.Controllers
                 Title = item.Title,
                 Description = item.Description,
                 LibraryCode = item.LibraryCode,
-                Status = item.Status
+                Status = item.Status,
+                BranchId = item.BranchId,
+                BranchName = item.Branch?.Name
             };
 
             switch (item)
@@ -186,13 +260,35 @@ namespace LibraryManagementSystem.Controllers
 
             ValidateItemType(model);
 
-            if (!ModelState.IsValid)
-                return View(model);
-
             Item? item = await FindItem(id);
 
             if (item == null)
                 return NotFound();
+
+            // Person 1: the branch is read-only here (it changes only through
+            // a transfer), and status changes are blocked while a transfer is open.
+            model.BranchId = item.BranchId;
+            model.BranchName = item.Branch?.Name;
+            ModelState.Remove(nameof(model.BranchId));
+
+            var openTransfer = await _transferService.GetOpenTransferAsync(item.Id);
+
+            if (openTransfer != null && model.Status != item.Status)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Status),
+                    $"This item has an open transfer (#{openTransfer.Id}) to {openTransfer.ToBranch?.Name}. " +
+                    "Receive or cancel the transfer before changing its status.");
+            }
+            else if (model.Status == ItemStatus.InTransit && item.Status != ItemStatus.InTransit)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Status),
+                    "In transit is set automatically when a transfer is dispatched.");
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
 
             item.Title = model.Title;
             item.Description = model.Description;
@@ -260,6 +356,18 @@ namespace LibraryManagementSystem.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // Person 1: keep transfer history intact.
+            bool hasTransfers = await _context.ItemTransfers
+                .AnyAsync(t => t.ItemId == id);
+
+            if (hasTransfers)
+            {
+                TempData["Error"] =
+                    "This item cannot be deleted because it has transfer history.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
             _context.Items.Remove(item);
             await _context.SaveChangesAsync();
 
@@ -269,19 +377,28 @@ namespace LibraryManagementSystem.Controllers
         private async Task<Item?> FindItem(int id)
         {
             Item? book = await _context.Books
+                .Include(b => b.Branch)
                 .FirstOrDefaultAsync(b => b.Id == id);
 
             if (book != null)
                 return book;
 
             Item? toy = await _context.Toys
+                .Include(t => t.Branch)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (toy != null)
                 return toy;
 
             return await _context.Music
+                .Include(m => m.Branch)
                 .FirstOrDefaultAsync(m => m.Id == id);
+        }
+
+        private async Task PopulateBranchesAsync(int? selected)
+        {
+            ViewBag.Branches = new SelectList(
+                await _branchService.GetActiveBranchesAsync(), "Id", "Name", selected);
         }
 
         private void ValidateItemType(ItemFormViewModel model)

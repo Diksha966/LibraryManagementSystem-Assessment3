@@ -39,6 +39,12 @@ public class ItemsApiController : ControllerBase
             query = query.Where(i => i.Status == status.Value);
         }
 
+        // Person 1: branch filter (contract agreed with Person 2).
+        if (branchId.HasValue)
+        {
+            query = query.Where(i => i.BranchId == branchId.Value);
+        }
+
         var items = await query
             .OrderBy(i => i.Title)
             .Select(i => new
@@ -49,7 +55,8 @@ public class ItemsApiController : ControllerBase
                 i.Description,
                 Status = i.Status.ToString(),
                 ItemType = i.GetType().Name,
-                BranchId = branchId
+                i.BranchId,
+                BranchName = i.Branch != null ? i.Branch.Name : null
             })
             .ToListAsync();
 
@@ -61,9 +68,10 @@ public class ItemsApiController : ControllerBase
     {
         var item = await _context.Items
             .AsNoTracking()
+            .Include(i => i.Branch)
             .FirstOrDefaultAsync(i => i.Id == id);
 
-        if (item == null)
+        if (item == null || (branchId.HasValue && item.BranchId != branchId.Value))
         {
             return NotFound();
         }
@@ -76,7 +84,8 @@ public class ItemsApiController : ControllerBase
             item.Description,
             Status = item.Status.ToString(),
             ItemType = item.GetType().Name,
-            BranchId = branchId
+            item.BranchId,
+            BranchName = item.Branch?.Name
         });
     }
 }

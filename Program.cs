@@ -1,5 +1,6 @@
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services.Branches;
 using LibraryManagementSystem.Services.Exports;
 using LibraryManagementSystem.Services.Notifications;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,10 @@ builder.Services.AddRazorPages();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddHostedService<OverdueNotificationBackgroundService>();
+
+// Person 1: multi-branch inventory and inter-branch transfers
+builder.Services.AddScoped<IBranchService, BranchService>();
+builder.Services.AddScoped<ITransferService, TransferService>();
 
 // Register the Entity Framework Core database context.
 builder.Services.AddDbContext<LibraryDbContext>(options =>
