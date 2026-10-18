@@ -437,7 +437,9 @@ Open that address in a web browser.
 
 Database Migrations
 
-If the database needs to be created or updated, run:
+The application applies pending Entity Framework Core migrations automatically at startup.
+
+If you prefer to apply migrations manually, run:
 
 dotnet ef database update
 

@@ -68,6 +68,10 @@ app.MapControllerRoute(
 
 using (var scope = app.Services.CreateScope())
 {
+    var dbContext = scope.ServiceProvider
+        .GetRequiredService<LibraryDbContext>();
+    await dbContext.Database.MigrateAsync();
+
     var roleManager = scope.ServiceProvider
         .GetRequiredService<RoleManager<IdentityRole>>();
 
